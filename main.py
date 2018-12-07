@@ -1,40 +1,46 @@
-class Reader:
-    def __init__(self, file):
-        self.lines = Reader.read_file(file)
-        self.line_count = len(self.lines)
-        self.line_pointer = 0
+import sys
+import re
 
-    @staticmethod
-    def read_file(file):
-        with open(file, 'r') as collection:
-            lines = list(map(lambda s: s.strip(), collection.readlines()))
-        return lines
+index = dict()
+common_words = set()
 
-    def get_next_doc(self):
-        try:
-            while self.lines[self.line_pointer][0:2] != '.I':
-                self.line_pointer += 1
-        except IndexError:
-            pass  # we reached EOF
+token = 0
 
-    def get_docs(self):
-        while True:
-            self.get_next_doc()
-            if self.line_pointer >= self.line_count:
-                break
-            docID = int(self.lines[self.line_pointer].split(' ')[1])
-            self.line_pointer += 1
-            assert self.lines[self.line_pointer] == '.T'  # sanity check
-            self.line_pointer += 1
-            docTitle = self.lines[self.line_pointer]
-            yield docID, docTitle
+with open("data/CACM/common_words", "r") as common_words_list:
+    for word in common_words_list:
+        common_words.add(word[:-1])
 
 
-reader = Reader("data/CACM/cacm.all")
+def traiter_ligne(docID, line):
+    words = re.split('[^a-z0-9]', line.lower())
+    token = 0
+    for word in words:
+        token += 1
+        if word not in common_words:
+            try:
+                index[word].add(docID)
+            except KeyError:
+                index[word] = {docID}
+    return token
 
-docID_docTitle = dict()
+reading = False
+while True:
+    line = sys.stdin.readline()[:-1]
+    if not line:
+        break
+    if line[0:2] == ".I":
+        docID = int(line.split(' ')[1])
+    if line[0:2] in [".T", ".W", ".K"]:
+        reading = True
+    elif line[0] == ".":
+        reading = False
+    elif reading:
+        token += traiter_ligne(docID, line)
 
-for docID, docTitle in reader.get_docs():
-    docID_docTitle[docID] = docTitle
+for word, value in index.items():
+    index[word] = sorted(list(value))
 
-print(docID_docTitle)
+print(index)
+
+print("Il y a {} tokens dans la collection.".format(token))
+print("Il y a {} mots dans le vocabulaire.".format(len(index)))
