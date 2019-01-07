@@ -48,22 +48,24 @@ def traiter_ligne(docID, line):
     return token
 
 reading = False
-while True:
-    line = sys.stdin.readline()[:-1]
-    if not line:
-        break
-    if line[0:2] == ".I":
-        docID = int(line.split(' ')[1])
-    if line[0:2] in [".T", ".W", ".K"]:
-        reading = True
-    elif line[0] == ".":
-        reading = False
-    elif reading:
-        token += traiter_ligne(docID, line)
-        logT.append(math.log(token, 10))
-        logM.append(math.log(len(index), 10))
+with open("data/CACM/cacm.all", "r") as cacm:
+    while True:
+        line = cacm.readline()[:-1]
+        if not line:
+            break
+        if line[0:2] == ".I":
+            docID = int(line.split(' ')[1])
+        if line[0:2] in [".T", ".W", ".K"]:
+            reading = True
+        elif line[0] == ".":
+            reading = False
+        elif reading:
+            token += traiter_ligne(docID, line)
+            logT.append(math.log(token, 10))
+            logM.append(math.log(len(index), 10))
 
 # On obtient un index de la forme {mot: [(docId1, frequency1), (docId2, frequency2), ...]}
+# Cela répond à la question 2.2 pour cacm
 for word, dicoDoc in index.items():
     index[word] = [(docID, frequency) for docID, frequency in dicoDoc.items()]
     index[word].sort()
@@ -94,12 +96,85 @@ rang.sort(key=lambda x : x[1], reverse=True)
 rangFreq = [rg[1] for rg in rang]
 
 plt.plot(range(1, len(rang)+1),rangFreq)
-plt.show()
+plt.savefig("freq_vs_rg.png")
+#plt.show()
 
 logRang=[math.log10(k) for k in range(1, len(rang)+1)]
 logFreq=[math.log10(f) for f in rangFreq]
 
 plt.plot(logRang, logFreq)
-plt.show()
+plt.savefig("logFreq_vs_logRg.png")
+#plt.show()
+
 
 ## NB remplacer par rang.append(sum(value[1] for value in index[word])) lorsque la lecture est corrigée.
+
+
+
+### Modèle de recherche booléen
+"""
+On utilise la forme infixe. On a donc pas besoin de parenthese
+
+word -> on cherche le posting
+NOT -> on prend le complément de ce qui est retrourné par l'appel récursif
+AND -> on prend l'intersection des deux appels récursifs
+OR -> on prend l'union des deux appels récursifs
+
+exemple:
+AND teletype OR console debugging
+"""
+
+class NotExpr(Exception):pass
+allDocIDs = set(range(1,docID+1))
+
+def get_posting(word):
+    try:
+        return set(dicoDoc[0] for dicoDoc in index[word])
+    except KeyError:
+        return set()
+
+def analyse_expr(lst):
+    current = lst.pop(0)
+
+    # NOT
+    if current == 'NOT':
+        # right after the negation is a word
+        nextword = lst.pop(0).lower()
+        # we build the posting of this word
+        posting = get_posting(nextword)
+        # return the complement
+        return allDocIDs.difference(posting)
+    
+    # OR
+    elif current == 'OR':
+        # deal with the first expression
+        first = analyse_expr(lst)
+        # deal with the second expression
+        second = analyse_expr(lst)
+        # return the union of the postings
+        return first.union(second)
+    
+    # AND
+    elif current == 'AND':
+        # deal with the first expression
+        first = analyse_expr(lst)
+        # deal with the second expression
+        second = analyse_expr(lst)
+        # return the intersection of the expression
+        return first.intersection(second)
+
+    # it's a word
+    else:
+        return get_posting(current.lower())
+
+doARequest = 1
+
+while(doARequest):
+    try:
+        doARequest = int(input("Do you want to do a boolean request ?[0/1]\n"))
+    except ValueError:
+        break
+    if doARequest == 1:
+        print(analyse_expr(input("Please enter your request using infix from.\n").split()))
+
+
