@@ -1,11 +1,9 @@
-"""
-TODO: transformer l'index pour avoir mot -> motID et motID -> docID et non mot-> docID
-"""
-
-
-import sys, re, math, time
+import sys
+import re
+import math
 from matplotlib import pyplot as plt
 import scipy.stats
+import time
 
 index = dict()
 common_words = set()
@@ -70,6 +68,8 @@ with open("data/CACM/cacm.all", "r") as cacm:
             logT.append(math.log(token, 10))
             logM.append(math.log(len(index), 10))
 
+# Nombre de documents dans la collection
+collection_doc_nb = docID
 # On obtient un index de la forme {mot: [(docId1, frequency1), (docId2, frequency2), ...]}
 # Cela répond à la question 2.2 pour cacm
 for word, dicoDoc in index.items():
@@ -84,12 +84,13 @@ slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(logT[len(lo
 
 b = slope
 k = 10**intercept
-print("Il y a {} tokens dans la collection.".format(token))
-print("Il y a {} mots dans le vocabulaire.".format(len(index)))
-print("b: ", b)
-print("log(k): ", intercept)
-print('k: ', k)
-print("Pour 1 000 000 de tokens, il y aurait {} mots de vocabulaire.".format(int(k*10e6**b)))
+# print("Il y a {} documents dans la collection.".format(collection_doc_nb))
+# print("Il y a {} tokens dans la collection.".format(token))
+# print("Il y a {} mots dans le vocabulaire.".format(len(index)))
+# print("b: ", b)
+# print("log(k): ", intercept)
+# print('k: ', k)
+# print("Pour 1 000 000 de tokens, il y aurait {} mots de vocabulaire.".format(int(k*10e6**b)))
 # plt.plot(logT, logM)
 # plt.show()
 
@@ -154,7 +155,7 @@ def analyse_expr(lst):
         posting = get_posting(nextword)
         # return the complement
         return allDocIDs.difference(posting)
-    
+
     # OR
     elif current == 'OR':
         # deal with the first expression
@@ -163,7 +164,7 @@ def analyse_expr(lst):
         second = analyse_expr(lst)
         # return the union of the postings
         return first.union(second)
-    
+
     # AND
     elif current == 'AND':
         # deal with the first expression
@@ -192,4 +193,6 @@ while(doARequest):
         print("Cela correspond aux documents :",res)
         print("Requete exécutée en {:.4f}s.".format(timeEndRequest - timeBeginningRequest))
 
-
+import search
+query = ['typical', 'information']
+print(search.vectorial_search(query, collection_doc_nb, index))
