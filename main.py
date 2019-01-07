@@ -1,6 +1,9 @@
-import sys
-import re
-import math
+"""
+TODO: transformer l'index pour avoir mot -> motID et motID -> docID et non mot-> docID
+"""
+
+
+import sys, re, math, time
 from matplotlib import pyplot as plt
 import scipy.stats
 
@@ -48,6 +51,9 @@ def traiter_ligne(docID, line):
     return token
 
 reading = False
+
+timeBeginningIndexCreation = time.time()
+
 with open("data/CACM/cacm.all", "r") as cacm:
     while True:
         line = cacm.readline()[:-1]
@@ -69,6 +75,10 @@ with open("data/CACM/cacm.all", "r") as cacm:
 for word, dicoDoc in index.items():
     index[word] = [(docID, frequency) for docID, frequency in dicoDoc.items()]
     index[word].sort()
+
+timeEndIndexCreation = time.time()
+
+print("Il a fallu {:.4f}s pour créer l'index.".format(timeEndIndexCreation - timeBeginningIndexCreation))
 
 slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(logT[len(logT)//2:], logM[len(logM)//2:])
 
@@ -175,6 +185,11 @@ while(doARequest):
     except ValueError:
         break
     if doARequest == 1:
-        print(analyse_expr(input("Please enter your request using infix from.\n").split()))
+        request = input("Please enter your request using infix from.\n").split()
+        timeBeginningRequest = time.time()
+        res = sorted(list(analyse_expr(request)))
+        timeEndRequest = time.time()
+        print("Cela correspond aux documents :",res)
+        print("Requete exécutée en {:.4f}s.".format(timeEndRequest - timeBeginningRequest))
 
 
