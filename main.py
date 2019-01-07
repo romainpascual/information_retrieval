@@ -20,7 +20,11 @@ with open("data/CACM/common_words", "r") as common_words_list:
 
 
 def traiter_ligne(docID, line):
-    words = re.split('[^a-z0-9]', line.lower())
+    words = list(filter(None, re.split(r'[^a-z0-9]', line.lower())))
+    if '' in words:
+        print(line)
+        print(words)
+        # sys.exit()
     token = 0
     for word in words:
         token += 1
@@ -59,7 +63,7 @@ while True:
         logT.append(math.log(token, 10))
         logM.append(math.log(len(index), 10))
 
-
+# On obtient un index de la forme {mot: [(docId1, frequency1), (docId2, frequency2), ...]}
 for word, dicoDoc in index.items():
     index[word] = [(docID, frequency) for docID, frequency in dicoDoc.items()]
     index[word].sort()
