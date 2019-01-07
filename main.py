@@ -81,3 +81,21 @@ print("Pour 1 000 000 de tokens, il y aurait {} mots de vocabulaire.".format(int
 #     print(type(docIDs))
 #     break
 
+rang = []
+for word in index.keys():
+    rang.append((word, sum(value[1] for value in index[word])))
+rang.sort(key=lambda x : x[1], reverse=True)
+#print(rang)
+
+rangFreq = [rg[1] for rg in rang]
+
+plt.plot(range(1, len(rang)+1),rangFreq)
+plt.show()
+
+logRang=[math.log10(k) for k in range(1, len(rang)+1)]
+logFreq=[math.log10(f) for f in rangFreq]
+
+plt.plot(logRang, logFreq)
+plt.show()
+
+## NB remplacer par rang.append(sum(value[1] for value in index[word])) lorsque la lecture est corrigée.
