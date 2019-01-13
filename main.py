@@ -157,3 +157,4 @@ while(doVectorialRequest):
         else:
             res =  vectorial_search.vectorial_search(query, collection_doc_nb, index, time_it)
             print("Cela correspond aux documents :",res)
+ 
