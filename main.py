@@ -120,79 +120,40 @@ plt.savefig("logFreq_vs_logRg.png")
 
 ## NB remplacer par rang.append(sum(value[1] for value in index[word])) lorsque la lecture est corrigée.
 
+# requests
 
-
-### Modèle de recherche booléen
-"""
-On utilise la forme infixe. On a donc pas besoin de parenthese
-
-word -> on cherche le posting
-NOT -> on prend le complément de ce qui est retrourné par l'appel récursif
-AND -> on prend l'intersection des deux appels récursifs
-OR -> on prend l'union des deux appels récursifs
-
-exemple:
-AND teletype OR console debugging
-"""
-
-class NotExpr(Exception):pass
-allDocIDs = set(range(1,docID+1))
-
-def get_posting(word):
+import boolean_search
+doBooleanRequest = 1
+while(doBooleanRequest):
     try:
-        return set(dicoDoc[0] for dicoDoc in index[word])
-    except KeyError:
-        return set()
-
-def analyse_expr(lst):
-    current = lst.pop(0)
-
-    # NOT
-    if current == 'NOT':
-        # right after the negation is a word
-        nextword = lst.pop(0).lower()
-        # we build the posting of this word
-        posting = get_posting(nextword)
-        # return the complement
-        return allDocIDs.difference(posting)
-
-    # OR
-    elif current == 'OR':
-        # deal with the first expression
-        first = analyse_expr(lst)
-        # deal with the second expression
-        second = analyse_expr(lst)
-        # return the union of the postings
-        return first.union(second)
-
-    # AND
-    elif current == 'AND':
-        # deal with the first expression
-        first = analyse_expr(lst)
-        # deal with the second expression
-        second = analyse_expr(lst)
-        # return the intersection of the expression
-        return first.intersection(second)
-
-    # it's a word
-    else:
-        return get_posting(current.lower())
-
-doARequest = 1
-
-while(doARequest):
-    try:
-        doARequest = int(input("Do you want to do a boolean request ?[0/1]\n"))
+        doBooleanRequest = int(input("Do you want to do a boolean request ?[0/1]\n"))
+        time_it = int(input("Do you want to time it ?"))
     except ValueError:
         break
-    if doARequest == 1:
-        request = input("Please enter your request using infix from.\n").split()
-        timeBeginningRequest = time.time()
-        res = sorted(list(analyse_expr(request)))
-        timeEndRequest = time.time()
-        print("Cela correspond aux documents :",res)
-        print("Requete exécutée en {:.4f}s.".format(timeEndRequest - timeBeginningRequest))
-
-import search
-query = ['typical', 'information']
-print(search.vectorial_search(query, collection_doc_nb, index))
+    if doBooleanRequest == 1:
+        query = input("Please enter your request using infix form.\n")
+        if time_it:
+            res, qtime = boolean_search.boolean_search(query, collection_doc_nb, index, time_it)
+            print("Cela correspond aux documents :",res)
+            print("Requete exécutée en {:.4f}s.".format(qtime))
+        else:
+            res =  boolean_search.boolean_search(query, collection_doc_nb, index, time_it)
+            print("Cela correspond aux documents :",res)
+        
+import vectorial_search
+doVectorialRequest = 1
+while(doVectorialRequest):
+    try:
+        doVectorialRequest = int(input("Do you want to do a vectorial request ?[0/1]\n"))
+        time_it = int(input("Do you want to time it ?"))
+    except ValueError:
+        break
+    if doBooleanRequest == 1:
+        query = input("Please enter your request as the words to search.\n")
+        if time_it:
+            res, qtime = vectorial_search.vectorial_search(query,collection_doc_nb,index, time_it)
+            print("Cela correspond aux documents :",res)
+            print("Requete exécutée en {:.4f}s.".format(qtime))
+        else:
+            res =  vectorial_search.vectorial_search(query, collection_doc_nb, index, time_it)
+            print("Cela correspond aux documents :",res)

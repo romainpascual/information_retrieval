@@ -1,4 +1,8 @@
-import math
+import math, time
+
+"""
+Implement vectorial search
+"""
 
 
 def get_term_frequency(word: str, document: int, index: dict):
@@ -17,7 +21,7 @@ def get_word_weight(term_frequency: int, document_frequency: int, collection_siz
         return (1+math.log(term_frequency, 10))*math.log(collection_size / document_frequency, 10)
 
 
-def vectorial_search(query: list, collection_size: int, index: dict, mode='tf-idf'):
+def vectorial_search(query: str, collection_size: int, index: dict, time_it = False, mode='tf-idf'):
     """
     Vectorial search algorithm implementation.
     :param query: list of K query terms
@@ -27,11 +31,13 @@ def vectorial_search(query: list, collection_size: int, index: dict, mode='tf-id
     :return:
     """
 
+    if time_it:
+       timeBeginningRequest = time.time()
     result = dict()
     for document in range(collection_size):
         sum_weight_doc = 0
         sum_weight2_doc = 0
-        for word in query:
+        for word in query.split():
             dtf = get_inverse_document_frequency(word, index)
             if document in [i for i, _ in index[word]]:
                 tf = get_term_frequency(word, document, index)
@@ -42,8 +48,9 @@ def vectorial_search(query: list, collection_size: int, index: dict, mode='tf-id
             result[document] = 0
         else:
             result[document] = sum_weight_doc / math.sqrt(sum_weight2_doc)
-
-    return sorted(result.items(), key=lambda kv: kv[1], reverse=True)
+    timeEndRequest = time.time()
+    res = sorted(result.items(), key=lambda kv: kv[1], reverse=True)
+    return res if (not time_it) else res, timeEndRequest - timeBeginningRequest
 
 
 
