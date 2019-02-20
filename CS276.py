@@ -8,36 +8,41 @@ import os
 from tqdm import tqdm
 import pickle
 
+from input import traiter_ligne, linguistique_ligne
 
-def traiter_ligne(docID, line):
-    words = list(filter(None, re.split(r'[^a-z0-9]', line.lower())))
-    if '' in words:
-        print(line)
-        print(words)
-        # sys.exit()
-    token = 0
-    for word in words:
-        token += 1
+# Traitements linguistiques
+common_words = set()
+freq = dict()
+words = set()
+token = 0
+logT = []
+logM = []
+for folder in range(10):
+    print("Traitements linguistiques sur la collection CS276/{}.".format(folder))
 
-        if word not in common_words:
+    for docID, filename in enumerate(tqdm(os.listdir('data/CS276/'+str(folder)),desc="Index {}".format(folder))):
+        with open('data/CS276/'+str(folder)+'/'+filename, "r") as file:
+            line = file.readline()
+            token += linguistique_ligne(line, freq, common_words, words, logT, logM)
 
-            # maj frequence
-            try:
-                freq[word] += 1
-            except KeyError:
-                freq[word] = 1
+print(words)
 
-            # maj indexß
-            try:
-                if docID in index[word]:
-                    index[word][docID] += 1
-                else:
-                    index[word][docID] = 1
-            except KeyError:
-                index[word] = {docID: 1}
-    return token
+slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(logT[len(logT)//2:], logM[len(logM)//2:])
 
+b = slope
+k = 10**intercept
+print("Il y a {} tokens dans la collection.".format(token))
+print("Il y a {} mots dans le vocabulaire.".format(len(words)))
+print("b: ", b)
+print("log(k): ", intercept)
+print('k: ', k)
+print("Pour 1 000 000 de tokens, il y aurait {} mots de vocabulaire.".format(int(k*10e6**b)))
+plt.plot(logT, logM)
+plt.show()
 
+exit()
+
+# Indexation
 def save_index(index, name):
     with open('indexes/' + name + '.index', 'wb+') as f:
         pickle.dump(index, f, pickle.HIGHEST_PROTOCOL)
@@ -55,7 +60,7 @@ for folder in range(10):
     for docID, filename in enumerate(tqdm(os.listdir('data/CS276/'+str(folder)),desc="Index {}".format(folder))):
         with open('data/CS276/'+str(folder)+'/'+filename, "r") as file:
             line = file.readline()
-            token += traiter_ligne(docID, line)
+            token += traiter_ligne(docID, line, index, freq, common_words)
             logT.append(math.log(token, 10))
             logM.append(math.log(len(index), 10))
 
@@ -74,21 +79,6 @@ for folder in range(10):
     save_index(index, "CS276_{}".format(folder))
     print("-"*12)
 
-
-
-# slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(logT[len(logT)//2:], logM[len(logM)//2:])
-#
-# b = slope
-# k = 10**intercept
-# print("Il y a {} documents dans la collection.".format(collection_doc_nb))
-# print("Il y a {} tokens dans la collection.".format(token))
-# print("Il y a {} mots dans le vocabulaire.".format(len(index)))
-# print("b: ", b)
-# print("log(k): ", intercept)
-# print('k: ', k)
-# print("Pour 1 000 000 de tokens, il y aurait {} mots de vocabulaire.".format(int(k*10e6**b)))
-# plt.plot(logT, logM)
-# plt.show()
 #
 # # for word, docIDs in index.items():
 # #     print(type(docIDs))
