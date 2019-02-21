@@ -15,9 +15,9 @@ with open("data/CACM/common_words", "r") as common_words_list:
         common_words.add(word[:-1])
 
 # --------------------------------------
-# -- traitement linguistique
+# -- Traitement linguistique
 # --------------------------------------
-from input import traiter_ligne, linguistique_ligne
+from input import linguistique_ligne
 
 freq = dict()
 token = 0
@@ -51,53 +51,63 @@ print("Il y a {} mots dans le vocabulaire (taille du vocabulaire).".format(len(f
 print("Paramètres de la loi de Heap: b={}, k={}, log(k)={}".format(slope,10**intercept,intercept))
 print("Pour 1 000 000 de tokens, il y aurait {} mots de vocabulaire.".format(int(k*10e6**b)))
 plt.plot(logT, logM)
-plt.show()
-plt.savefig("logT_vs_logM.png")
-exit()
+plt.savefig("logT_vs_logM_CACM.png")
+
+freqList = list(freq.values())
+freqList.sort(reverse=True)
+#print(rang)
+
+rangList = [k+1 for k in range(len(freqList))]
+
+plt.plot(rangList,freqList)
+plt.savefig("freq_vs_rg_CACM.png")
+#plt.show()
+
+logRang=[math.log10(k) for k in rangList]
+logFreq=[math.log10(f) for f in freqList]
+
+plt.plot(logRang, logFreq)
+plt.savefig("logFreq_vs_logRg_CACM.png")
+#plt.show()
+
+print("*"*12)
+
+# --------------------------------------
+# -- Création de l'index
+# --------------------------------------
+from input import index_ligne
 
 timeBeginningIndexCreation = time.time()
+reading = False
 index = dict()
+
+with open("data/CACM/cacm.all", "r") as cacm:
+    while True:
+        line = cacm.readline()[:-1]
+        if not line:
+            break
+        if line[0:2] == ".I":
+            docID = int(line.split(' ')[1])
+        if line[0:2] in [".T", ".W", ".K"]:
+            reading = True
+        elif line[0] == ".":
+            reading = False
+        elif reading:
+            index_ligne(docID, line, index, common_words)
 
 # Nombre de documents dans la collection
 collection_doc_nb = docID
+
 # On obtient un index de la forme {mot: [(docId1, frequency1), (docId2, frequency2), ...]}
 # Cela répond à la question 2.2 pour cacm
-"""
 for word, dicoDoc in index.items():
     index[word] = [(docID, frequency) for docID, frequency in dicoDoc.items()]
     index[word].sort()
-"""
-timeEndIndexCreation = time.time()
 
+timeEndIndexCreation = time.time()
 print("Il a fallu {:.4f}s pour créer l'index.".format(timeEndIndexCreation - timeBeginningIndexCreation))
 
-
-# for word, docIDs in index.items():
-#     print(type(docIDs))
-#     break
-
-rang = []
-for word in index.keys():
-    rang.append((word, sum(value[1] for value in index[word])))
-rang.sort(key=lambda x : x[1], reverse=True)
-#print(rang)
-
-rangFreq = [rg[1] for rg in rang]
-
-plt.plot(range(1, len(rang)+1),rangFreq)
-plt.savefig("freq_vs_rg.png")
-#plt.show()
-
-logRang=[math.log10(k) for k in range(1, len(rang)+1)]
-logFreq=[math.log10(f) for f in rangFreq]
-
-plt.plot(logRang, logFreq)
-plt.savefig("logFreq_vs_logRg.png")
-#plt.show()
-
-
-## NB remplacer par rang.append(sum(value[1] for value in index[word])) lorsque la lecture est corrigée.
-
+exit()
 # requests
 
 import boolean_search
