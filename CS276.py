@@ -75,18 +75,20 @@ for folder in range(10):
     print("Création de l'index sur la collection CS276/{}.".format(folder))
     timeBeginningIndexCreation = time.time()
     index = dict()
+    wordDic = dict()
+    wordID = 0
     for docID, filename in enumerate(tqdm(os.listdir('data/CS276/'+str(folder)),desc="Index {}".format(folder))):
         with open('data/CS276/'+str(folder)+'/'+filename, "r") as file:
             line = file.readline()
-            index_ligne(docID, line, index, common_words)
+            wordID = index_ligne(docID, line, index, wordDic, wordID, common_words)
 
     # Nombre de documents dans la collection
     collection_doc_nb = docID+1
     # On obtient un index de la forme {mot: [(docId1, frequency1), (docId2, frequency2), ...]}
     # Cela répond à la question 2.2 pour CS276
-    for word, dicoDoc in index.items():
-        index[word] = [(docID, frequency) for docID, frequency in dicoDoc.items()]
-        index[word].sort()
+    for w_ID, docSet in index.items():
+        index[w_ID] = sorted(docSet)
+
 
     timeEndIndexCreation = time.time()
 
@@ -99,8 +101,6 @@ for folder in range(10):
 print(times)
 exit()
 
-## NB remplacer par rang.append(sum(value[1] for value in index[word])) lorsque la lecture est corrigée.
-#
 # # requests
 #
 # import boolean_search
@@ -114,11 +114,11 @@ exit()
 #     if doBooleanRequest == 1:
 #         query = input("Please enter your request using infix form.\n")
 #         if time_it:
-#             res, qtime = boolean_search.boolean_search(query, collection_doc_nb, index, time_it)
+#             res, qtime = boolean_search.boolean_search(query, collection_doc_nb, index, wordDic, time_it)
 #             print("Cela correspond aux documents :",res)
 #             print("Requete exécutée en {:.4f}s.".format(qtime))
 #         else:
-#             res =  boolean_search.boolean_search(query, collection_doc_nb, index, time_it)
+#             res =  boolean_search.boolean_search(query, collection_doc_nb, index, wordDic,  time_it)
 #             print("Cela correspond aux documents :",res)
 #
 # import vectorial_search
@@ -132,10 +132,10 @@ exit()
 #     if doBooleanRequest == 1:
 #         query = input("Please enter your request as the words to search.\n")
 #         if time_it:
-#             res, qtime = vectorial_search.vectorial_search(query,collection_doc_nb,index, time_it)
+#             res, qtime = vectorial_search.vectorial_search(query, collection_doc_nb, index, wordDic, time_it)
 #             print("Cela correspond aux documents :",res)
 #             print("Requete exécutée en {:.4f}s.".format(qtime))
 #         else:
-#             res =  vectorial_search.vectorial_search(query, collection_doc_nb, index, time_it)
+#             res =  vectorial_search.vectorial_search(query, collection_doc_nb, index, wordDic,  time_it)
 #             print("Cela correspond aux documents :",res)
  

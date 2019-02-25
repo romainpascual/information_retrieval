@@ -5,15 +5,15 @@ Implement vectorial search
 """
 
 
-def get_term_frequency(word: str, document: int, index: dict):
+def get_term_frequency(word: str, document: int, index: dict, wordDic:dict):
     try:
-        return list(j for i, j in index[word] if i == document)[0]
+        return list(j for i, j in index[wordDic[word]] if i == document)
     except IndexError:
         return 0
 
 
-def get_inverse_document_frequency(word: str, index: dict):
-    return len(index[word])
+def get_inverse_document_frequency(word: str, index: dict, wordDic:dict):
+    return len(index[wordDic[word]])
 
 
 def get_word_weight(term_frequency: int, document_frequency: int, collection_size: int, mode='tf-idf'):
@@ -21,12 +21,13 @@ def get_word_weight(term_frequency: int, document_frequency: int, collection_siz
         return (1+math.log(term_frequency, 10))*math.log(collection_size / document_frequency, 10)
 
 
-def vectorial_search(query: str, collection_size: int, index: dict, time_it = False, mode='tf-idf'):
+def vectorial_search(query: str, collection_size: int, index: dict, wordDic:dict, time_it = False, mode='tf-idf'):
     """
     Vectorial search algorithm implementation.
     :param query: list of K query terms
     :param collection_size: number of documents in the collection
     :param index: inverted index of the collection
+    :param wordDic: word to wordID dictionnary
     :param mode: search mode. 'tf-idf', 'normalized-tf-idf', 'normalized-frequency'
     :return:
     """
@@ -38,9 +39,9 @@ def vectorial_search(query: str, collection_size: int, index: dict, time_it = Fa
         sum_weight_doc = 0
         sum_weight2_doc = 0
         for word in query.split():
-            dtf = get_inverse_document_frequency(word, index)
-            if document in [i for i, _ in index[word]]:
-                tf = get_term_frequency(word, document, index)
+            dtf = get_inverse_document_frequency(word, index, wordDic)
+            if document in [i for i, _ in index[wordDic[word]]]:
+                tf = get_term_frequency(word, document, index, wordDic)
                 word_weight = get_word_weight(tf, dtf, collection_size)
                 sum_weight_doc += word_weight
                 sum_weight2_doc += word_weight**2

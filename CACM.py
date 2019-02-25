@@ -80,6 +80,8 @@ from input import index_ligne
 timeBeginningIndexCreation = time.time()
 reading = False
 index = dict()
+wordDic = dict()
+wordID = 0
 
 with open("data/CACM/cacm.all", "r") as cacm:
     while True:
@@ -93,21 +95,19 @@ with open("data/CACM/cacm.all", "r") as cacm:
         elif line[0] == ".":
             reading = False
         elif reading:
-            index_ligne(docID, line, index, common_words)
+            wordID = index_ligne(docID, line, index, wordDic, wordID, common_words)
 
 # Nombre de documents dans la collection
-collection_doc_nb = docID
+collection_doc_nb = docID+1
 
-# On obtient un index de la forme {mot: [(docId1, frequency1), (docId2, frequency2), ...]}
+# On obtient un index de la forme {motID: {docID1, docID3, docID2, ...}}
 # Cela répond à la question 2.2 pour cacm
-for word, dicoDoc in index.items():
-    index[word] = [(docID, frequency) for docID, frequency in dicoDoc.items()]
-    index[word].sort()
+for w_ID, docSet in index.items():
+    index[w_ID] = sorted(docSet)
 
 timeEndIndexCreation = time.time()
 print("Il a fallu {:.4f}s pour créer l'index.".format(timeEndIndexCreation - timeBeginningIndexCreation))
 
-exit()
 # requests
 
 import boolean_search
@@ -115,17 +115,20 @@ doBooleanRequest = 1
 while(doBooleanRequest):
     try:
         doBooleanRequest = int(input("Do you want to do a boolean request ?[0/1]\n"))
-        time_it = int(input("Do you want to time it ?"))
     except ValueError:
         break
     if doBooleanRequest == 1:
+        try:
+            time_it = int(input("Do you want to time it ?[0/1]\n"))
+        except ValueError:
+            break       
         query = input("Please enter your request using infix form.\n")
         if time_it:
-            res, qtime = boolean_search.boolean_search(query, collection_doc_nb, index, time_it)
+            res, qtime = boolean_search.boolean_search(query, collection_doc_nb, index, wordDic, True)
             print("Cela correspond aux documents :",res)
             print("Requete exécutée en {:.4f}s.".format(qtime))
         else:
-            res =  boolean_search.boolean_search(query, collection_doc_nb, index, time_it)
+            res =  boolean_search.boolean_search(query, collection_doc_nb, index, wordDic, False)
             print("Cela correspond aux documents :",res)
         
 import vectorial_search
@@ -133,16 +136,19 @@ doVectorialRequest = 1
 while(doVectorialRequest):
     try:
         doVectorialRequest = int(input("Do you want to do a vectorial request ?[0/1]\n"))
-        time_it = int(input("Do you want to time it ?"))
     except ValueError:
         break
-    if doBooleanRequest == 1:
+    if doVectorialRequest == 1:
+        try:
+            time_it = int(input("Do you want to time it ?[0/1]\n"))
+        except ValueError:
+            break   
         query = input("Please enter your request as the words to search.\n")
         if time_it:
-            res, qtime = vectorial_search.vectorial_search(query,collection_doc_nb,index, time_it)
+            res, qtime = vectorial_search.vectorial_search(query, collection_doc_nb, index, wordDic, True)
             print("Cela correspond aux documents :",res)
             print("Requete exécutée en {:.4f}s.".format(qtime))
         else:
-            res =  vectorial_search.vectorial_search(query, collection_doc_nb, index, time_it)
+            res =  vectorial_search.vectorial_search(query, collection_doc_nb, index, wordDic, False)
             print("Cela correspond aux documents :",res)
  

@@ -20,18 +20,24 @@ def linguistique_ligne(line, freq, common_words):
                 freq[word] = 1
     return token
 
-def index_ligne(docID, line, index, common_words):
+def index_ligne(docID, line, index, wordDic, wordID, common_words):
     """
     Traitement d'une ligne pour la construction de l'index
     """
     words = list(filter(None, re.split(r'[^a-z0-9]', line.lower())))
     for word in words:
         if word not in common_words:
+
+            # maj words
+            if word not in wordDic:
+                wordDic[word] = wordID
+                wordID += 1
+        
             # maj indexß
+            w_ID = wordDic[word]
             try:
-                if docID in index[word]:
-                    index[word][docID] += 1
-                else:
-                    index[word][docID] = 1
+                index[w_ID].add(docID)
             except KeyError:
-                index[word] = {docID: 1}
+                index[w_ID] = {docID}
+    
+    return wordID

@@ -19,13 +19,13 @@ class NotExpr(Exception):pass
 def get_complementary_posting(posting, collection_size):
     return set(range(1,collection_size+1)).difference(posting)
 
-def get_posting(word, index):
+def get_posting(word, index, wordDic):
     try:
-        return set(dicoDoc[0] for dicoDoc in index[word])
+        return set(index[wordDic[word]])
     except KeyError:
         return set()
 
-def analyse_expr(request, index, collection_size):
+def analyse_expr(request, index, wordDic, collection_size):
     current = request.pop(0)
 
     # NOT
@@ -33,49 +33,52 @@ def analyse_expr(request, index, collection_size):
         # right after the negation is a word
         nextword = request.pop(0).lower()
         # we build the posting of this word
-        posting = get_posting(nextword, index)
+        posting = get_posting(nextword, index, wordDic)
         # return the complement
         return get_complementary_posting(posting, collection_size)
 
     # OR
     elif current == 'OR':
         # deal with the first expression
-        first = analyse_expr(request, index, collection_size)
+        first = analyse_expr(request, index, wordDic, collection_size)
         # deal with the second expression
-        second = analyse_expr(request, index, collection_size)
+        second = analyse_expr(request, index, wordDic, collection_size)
         # return the union of the postings
         return first.union(second)
 
     # AND
     elif current == 'AND':
         # deal with the first expression
-        first = analyse_expr(request, index, collection_size)
+        first = analyse_expr(request, index, wordDic, collection_size)
         # deal with the second expression
-        second = analyse_expr(request, index, collection_size)
+        second = analyse_expr(request, index, wordDic, collection_size)
         # return the intersection of the expression
         return first.intersection(second)
 
     # it's a word
     else:
-        return get_posting(current.lower(), index)
+        return get_posting(current.lower(), index, wordDic)
 
-def boolean_search(query: str, collection_size: int, index: dict, time_it=False):
+def boolean_search(query: str, collection_size: int, index: dict, wordDic:dict, time_it=False):
     """
     Boolean search algorithm implementation.
     :param query: boolean expression describing the query
     :param collection_size: number of documents in the collection
     :param index: inverted index of the collection
+    :param wordDic: word to wordID dictionnary
     :param time_it: boolean to enable performance measures
     :return:
     """
 
+    print(time_it)
     request = query.split()
 
     if time_it:
        timeBeginningRequest = time.time()
     
-    res = sorted(list(analyse_expr(request, index, collection_size)))
-    
-    timeEndRequest = time.time()
+    res = sorted(list(analyse_expr(request, index, wordDic, collection_size)))
 
-    return res if (not time_it) else res, timeEndRequest - timeBeginningRequest
+    if time_it:
+        return res, time.time() - timeBeginningRequest
+    else:
+        return res
