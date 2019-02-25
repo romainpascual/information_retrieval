@@ -106,7 +106,12 @@ for w_ID, docSet in index.items():
     index[w_ID] = sorted(docSet)
 
 timeEndIndexCreation = time.time()
-print("Il a fallu {:.4f}s pour créer l'index.".format(timeEndIndexCreation - timeBeginningIndexCreation))
+indexCreationTime = timeEndIndexCreation - timeBeginningIndexCreation
+print("Il a fallu {:.4f}s pour créer l'index.".format(indexCreationTime))
+
+# output index
+from output import save_index
+save_index('indexes/CACM.txt', "CACM", index, wordDic, indexCreationTime, withWordDic=True)
 
 # requests
 
