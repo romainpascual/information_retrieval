@@ -12,12 +12,12 @@ def save_index(filename, name, index, wordDic, time, withWordDic=True):
             f.write("# END Word to WordID\n\n")
         f.write("Index - on {} words".format(len(wordDic)))
         for k,v in index.items():
-            f.write(str(k) + list2string(v)+ "\n")
+            f.write(str(k) + doubletList2string(v)+ "\n")
         f.write("# END Word to WordID\n")
 
-def list2string(l):
+def doubletList2string(l):
     s = ""
     for k in l[:-1]:
-        s += str(k) + " "
-    s += str(l[-1])
+        s += "({}, {}) ".format(k[0], k[1])
+    s += "({}, {})".format(l[-1][0], l[-1][1])
     return s

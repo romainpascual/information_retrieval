@@ -21,7 +21,7 @@ def get_complementary_posting(posting, collection_size):
 
 def get_posting(word, index, wordDic):
     try:
-        return set(index[wordDic[word]])
+        return set(doc[0] for doc in index[wordDic[word]])
     except KeyError:
         return set()
 

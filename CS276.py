@@ -87,7 +87,8 @@ for folder in range(10):
     # On obtient un index de la forme {mot: [(docId1, frequency1), (docId2, frequency2), ...]}
     # Cela répond à la question 2.2 pour CS276
     for w_ID, docSet in index.items():
-        index[w_ID] = sorted(docSet)
+        index[w_ID] = [(docID, freq) for docID,freq in docSet.items()]
+        index[w_ID].sort(key=lambda x : x[1], reverse=True)
 
 
     timeEndIndexCreation = time.time()

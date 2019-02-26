@@ -36,8 +36,11 @@ def index_ligne(docID, line, index, wordDic, wordID, common_words):
             # maj indexß
             w_ID = wordDic[word]
             try:
-                index[w_ID].add(docID)
+                if docID in index[w_ID]:
+                    index[w_ID][docID] += 1
+                else:
+                    index[w_ID][docID] = 1
             except KeyError:
-                index[w_ID] = {docID}
+                index[w_ID] = {docID:1}
     
     return wordID

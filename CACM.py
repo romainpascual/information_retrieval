@@ -100,11 +100,11 @@ with open("data/CACM/cacm.all", "r") as cacm:
 # Nombre de documents dans la collection
 collection_doc_nb = docID+1
 
-# On obtient un index de la forme {motID: {docID1, docID3, docID2, ...}}
+# On obtient un index de la forme {motID: {(docID1, freqDoc1), (docID3, freqDoc3), (docID2, freqDoc2) ...}}
 # Cela répond à la question 2.2 pour cacm
 for w_ID, docSet in index.items():
-    index[w_ID] = sorted(docSet)
-
+    index[w_ID] = [(docID, freq) for docID,freq in docSet.items()]
+    index[w_ID].sort(key=lambda x : x[1], reverse=True)
 timeEndIndexCreation = time.time()
 indexCreationTime = timeEndIndexCreation - timeBeginningIndexCreation
 print("Il a fallu {:.4f}s pour créer l'index.".format(indexCreationTime))
