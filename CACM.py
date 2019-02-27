@@ -17,64 +17,71 @@ with open("data/CACM/common_words", "r") as common_words_list:
 # --------------------------------------
 # -- Traitement linguistique
 # --------------------------------------
-from input import linguistique_ligne
+doLanguageProcessing = 0
+try:
+    doLanguageProcessing = int(input("Do you want to do language processing ?[0/1]\n"))
+except ValueError:
+    pass
+if doLanguageProcessing == 1:
+    from input import linguistique_ligne
 
-freq = dict()
-token = 0
-logT = []
-logM = []
-reading = False
+    freq = dict()
+    token = 0
+    logT = []
+    logM = []
+    reading = False
 
-with open("data/CACM/cacm.all", "r") as cacm:
-    while True:
-        line = cacm.readline()[:-1]
-        if not line:
-            break
-        if line[0:2] == ".I":
-            docID = int(line.split(' ')[1])
-        if line[0:2] in [".T", ".W", ".K"]:
-            reading = True
-        elif line[0] == ".":
-            reading = False
-        elif reading:
-            token += linguistique_ligne(line, freq, common_words)
-            logT.append(math.log(token, 10))
-            logM.append(math.log(len(freq), 10))
+    with open("data/CACM/cacm.all", "r") as cacm:
+        while True:
+            line = cacm.readline()[:-1]
+            if not line:
+                break
+            if line[0:2] == ".I":
+                docID = int(line.split(' ')[1])
+            if line[0:2] in [".T", ".W", ".K"]:
+                reading = True
+            elif line[0] == ".":
+                reading = False
+            elif reading:
+                token += linguistique_ligne(line, freq, common_words)
+                logT.append(math.log(token, 10))
+                logM.append(math.log(len(freq), 10))
 
 
-slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(logT[len(logT)//2:], logM[len(logM)//2:])
+    slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(logT[len(logT)//2:], logM[len(logM)//2:])
 
-b = slope
-k = 10**intercept
-print("Il y a {} tokens dans la collection.".format(token))
-print("Il y a {} mots dans le vocabulaire (taille du vocabulaire).".format(len(freq)))
-print("Paramètres de la loi de Heap: b={}, k={}, log(k)={}".format(slope,10**intercept,intercept))
-print("Pour 1 000 000 de tokens, il y aurait {} mots de vocabulaire.".format(int(k*10e6**b)))
-plt.plot(logT, logM)
-plt.savefig("logT_vs_logM_CACM.png")
+    b = slope
+    k = 10**intercept
+    print("Il y a {} tokens dans la collection.".format(token))
+    print("Il y a {} mots dans le vocabulaire (taille du vocabulaire).".format(len(freq)))
+    print("Paramètres de la loi de Heap: b={}, k={}, log(k)={}".format(slope,10**intercept,intercept))
+    print("Pour 1 000 000 de tokens, il y aurait {} mots de vocabulaire.".format(int(k*10e6**b)))
+    plt.plot(logT, logM)
+    plt.savefig("logT_vs_logM_CACM.png")
 
-freqList = list(freq.values())
-freqList.sort(reverse=True)
-#print(rang)
+    freqList = list(freq.values())
+    freqList.sort(reverse=True)
+    #print(rang)
 
-rangList = [k+1 for k in range(len(freqList))]
+    rangList = [k+1 for k in range(len(freqList))]
 
-plt.plot(rangList,freqList)
-plt.savefig("freq_vs_rg_CACM.png")
-#plt.show()
+    plt.plot(rangList,freqList)
+    plt.savefig("freq_vs_rg_CACM.png")
+    #plt.show()
 
-logRang=[math.log10(k) for k in rangList]
-logFreq=[math.log10(f) for f in freqList]
+    logRang=[math.log10(k) for k in rangList]
+    logFreq=[math.log10(f) for f in freqList]
 
-plt.plot(logRang, logFreq)
-plt.savefig("logFreq_vs_logRg_CACM.png")
-#plt.show()
+    plt.plot(logRang, logFreq)
+    plt.savefig("logFreq_vs_logRg_CACM.png")
+    #plt.show()
 
 print("*"*12)
 
 # --------------------------------------
 # -- Création de l'index
 # --------------------------------------
+print("Index creation --")
 from input import index_ligne
 
 timeBeginningIndexCreation = time.time()
@@ -109,14 +116,24 @@ timeEndIndexCreation = time.time()
 indexCreationTime = timeEndIndexCreation - timeBeginningIndexCreation
 print("Il a fallu {:.4f}s pour créer l'index.".format(indexCreationTime))
 
-# output index
-from output import save_index
-save_index('indexes/CACM.txt', "CACM", index, wordDic, indexCreationTime, withWordDic=True)
+# --------------------------------------
+# -- Sauvegarde de l'index
+# --------------------------------------
+doIndexSaving = 0
+try:
+    doIndexSaving = int(input("Do you want to save the index ?[0/1]\n"))
+except ValueError:
+    pass
+if doIndexSaving == 1:
+    from output import save_index
+    save_index('indexes/CACM.txt', "CACM", index, wordDic, indexCreationTime, withWordDic=True)
 
-# requests
+# --------------------------------------
+# -- Requetes
+# --------------------------------------
 
 import boolean_search
-doBooleanRequest = 1
+doBooleanRequest = 0
 while(doBooleanRequest):
     try:
         doBooleanRequest = int(input("Do you want to do a boolean request ?[0/1]\n"))
@@ -137,7 +154,7 @@ while(doBooleanRequest):
             print("Cela correspond aux documents :",res)
         
 import vectorial_search
-doVectorialRequest = 1
+doVectorialRequest = 0
 while(doVectorialRequest):
     try:
         doVectorialRequest = int(input("Do you want to do a vectorial request ?[0/1]\n"))

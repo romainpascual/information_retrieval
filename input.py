@@ -1,5 +1,5 @@
 """
-Aux functions to build the index
+Fonctions auxiliaires pour le traitement des données
 """
 
 import re, math
@@ -42,5 +42,25 @@ def index_ligne(docID, line, index, wordDic, wordID, common_words):
                     index[w_ID][docID] = 1
             except KeyError:
                 index[w_ID] = {docID:1}
+    
+    return wordID
+
+def vbe_index_ligne(docID, line, index, wordDic, wordID):
+    """
+    Traitement d'une ligne pour la construction de l'index avec la compression Variable Byte Encoding
+    """
+    words = list(filter(None, re.split(r'[^a-z0-9]', line.lower())))
+    for word in words:
+        # maj words
+        if word not in wordDic:
+            wordDic[word] = wordID
+            wordID += 1
+    
+        # maj indexß
+        w_ID = wordDic[word]
+        try:
+            index[w_ID].add(docID)
+        except KeyError:
+                index[w_ID] = set([docID])
     
     return wordID
