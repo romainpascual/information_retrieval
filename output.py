@@ -8,12 +8,12 @@ def save_index(filename, name, index, wordDic, time, withWordDic=True):
         if withWordDic:
             f.write("Word to WordID - on {} words\n".format(len(wordDic)))
             for k,v in wordDic.items():
-                f.write(k + str(v)+ "\n")
+                f.write(k + " " + str(v)+ "\n")
             f.write("# END Word to WordID\n\n")
-        f.write("Index - on {} words".format(len(wordDic)))
+        f.write("Index - on {} words\n".format(len(wordDic)))
         for k,v in index.items():
-            f.write(str(k) + doubletList2string(v)+ "\n")
-        f.write("# END Word to WordID\n")
+            f.write(str(k) + " : " + doubletList2string(v)+ "\n")
+        f.write("# END Index\n")
 
 def doubletList2string(l):
     s = ""

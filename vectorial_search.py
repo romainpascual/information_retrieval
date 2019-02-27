@@ -7,7 +7,7 @@ Implement vectorial search
 
 def get_term_frequency(word: str, document: int, index: dict, wordDic:dict):
     try:
-        return list(j for i, j in index[wordDic[word]] if i == document)
+         return list(j for i, j in index[wordDic[word]] if i == document)[0]
     except IndexError:
         return 0
 
@@ -31,9 +31,8 @@ def vectorial_search(query: str, collection_size: int, index: dict, wordDic:dict
     :param mode: search mode. 'tf-idf', 'normalized-tf-idf', 'normalized-frequency'
     :return:
     """
-
-    if time_it:
-       timeBeginningRequest = time.time()
+    
+    timeBeginningRequest = time.time()
     result = dict()
     for document in range(collection_size):
         sum_weight_doc = 0
@@ -49,9 +48,12 @@ def vectorial_search(query: str, collection_size: int, index: dict, wordDic:dict
             result[document] = 0
         else:
             result[document] = sum_weight_doc / math.sqrt(sum_weight2_doc)
-    timeEndRequest = time.time()
     res = sorted(result.items(), key=lambda kv: kv[1], reverse=True)
-    return res if (not time_it) else res, timeEndRequest - timeBeginningRequest
+    res = [k[0] for k in res]
+    if time_it:
+        return res, time.time() - timeBeginningRequest
+    else:
+        return res
 
 
 
