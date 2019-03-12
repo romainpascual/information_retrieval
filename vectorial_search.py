@@ -11,14 +11,40 @@ def get_term_frequency(word: str, document: int, index: dict, wordDic:dict):
     except IndexError:
         return 0
 
+def get_max_term_frequency(document:int, index:dict):
+    max_tf = 0
+    for docSet in index.values():
+        if docSet[0] == document:
+            tf = docSet[1]
+            if tf > max_tf:
+                max_tf = tf
+    return max_tf
 
 def get_inverse_document_frequency(word: str, index: dict, wordDic:dict):
     return len(index[wordDic[word]])
 
 
-def get_word_weight(term_frequency: int, document_frequency: int, collection_size: int, mode='tf-idf'):
+def get_word_weight(document_frequency: int, collection_size: int, word:str, document:int , index: dict, wordDic:dict, mode='tf-idf'):
+    """
+    mode = 'tf-idf'
+    mode = 'tf-idf-norm'
+    mode = 'freq-norm'
+    """
+    tf = get_term_frequency(word, document, index, wordDic)
+    idf = math.log(collection_size / document_frequency, 10)
+
     if mode == 'tf-idf':
-        return (1+math.log(term_frequency, 10))*math.log(collection_size / document_frequency, 10)
+        # w(t,d) = tf * idf
+        return tf * idf
+    elif mode == 'tf-idf-norm':
+        # w(t,d) = (1+log(tf)) * idf
+        return (1+math.log(tf, 10))*idf
+    elif mode == 'freq-norm':
+        # w(t_i,d) = tf(t_i,d)/ max_{t_j \in d} tf(t_j,d)
+        max_tf = get_max_term_frequency(document, index)
+        if max_tf == 0:
+            return 0
+        return tf / max_tf
 
 
 def vectorial_search(query: str, collection_size: int, index: dict, wordDic:dict, time_it = False, mode='tf-idf'):
@@ -40,8 +66,7 @@ def vectorial_search(query: str, collection_size: int, index: dict, wordDic:dict
         for word in query.split():
             dtf = get_inverse_document_frequency(word, index, wordDic)
             if document in [i for i, _ in index[wordDic[word]]]:
-                tf = get_term_frequency(word, document, index, wordDic)
-                word_weight = get_word_weight(tf, dtf, collection_size)
+                word_weight = get_word_weight(dtf, collection_size, word, document, index, wordDic)
                 sum_weight_doc += word_weight
                 sum_weight2_doc += word_weight**2
         if sum_weight2_doc == 0:
