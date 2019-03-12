@@ -57,7 +57,7 @@ if doLanguageProcessing == 1:
     print("Paramètres de la loi de Heap: b={}, k={}, log(k)={}".format(slope,10**intercept,intercept))
     print("Pour 1 000 000 de tokens, il y aurait {} mots de vocabulaire.".format(int(k*10e6**b)))
     plt.plot(logT, logM)
-    plt.savefig("logT_vs_logM_CACM.png")
+    plt.savefig("results/logT_vs_logM_CACM.png")
 
     freqList = list(freq.values())
     freqList.sort(reverse=True)
@@ -66,14 +66,14 @@ if doLanguageProcessing == 1:
     rangList = [k+1 for k in range(len(freqList))]
 
     plt.plot(rangList,freqList)
-    plt.savefig("freq_vs_rg_CACM.png")
+    plt.savefig("results/freq_vs_rg_CACM.png")
     #plt.show()
 
     logRang=[math.log10(k) for k in rangList]
     logFreq=[math.log10(f) for f in freqList]
 
     plt.plot(logRang, logFreq)
-    plt.savefig("logFreq_vs_logRg_CACM.png")
+    plt.savefig("results/logFreq_vs_logRg_CACM.png")
     #plt.show()
 
 print("*"*12)
@@ -123,17 +123,18 @@ doIndexSaving = 0
 try:
     doIndexSaving = int(input("Do you want to save the index ?[0/1]\n"))
 except ValueError:
+    print("error")
     pass
 if doIndexSaving == 1:
-    from output import save_index
-    save_index('indexes/CACM.txt', "CACM", index, wordDic, indexCreationTime, withWordDic=True)
+    from output import index_saving
+    index_saving('results/CACM.txt', "CACM", index, wordDic, indexCreationTime, withWordDic=True)
 
 # --------------------------------------
 # -- Requetes
 # --------------------------------------
 
 import boolean_search
-doBooleanRequest = 0
+doBooleanRequest = 1
 while(doBooleanRequest):
     try:
         doBooleanRequest = int(input("Do you want to do a boolean request ?[0/1]\n"))
@@ -154,7 +155,7 @@ while(doBooleanRequest):
             print("Cela correspond aux documents :",res)
         
 import vectorial_search
-doVectorialRequest = 0
+doVectorialRequest = 1
 while(doVectorialRequest):
     try:
         doVectorialRequest = int(input("Do you want to do a vectorial request ?[0/1]\n"))
