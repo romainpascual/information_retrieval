@@ -123,7 +123,7 @@ doIndexSaving = 0
 try:
     doIndexSaving = int(input("Do you want to save the index ?[0/1]\n"))
 except ValueError:
-    print("error")
+    print("Not saved")
     pass
 if doIndexSaving == 1:
     from output import index_saving
@@ -139,6 +139,7 @@ while(doBooleanRequest):
     try:
         doBooleanRequest = int(input("Do you want to do a boolean request ?[0/1]\n"))
     except ValueError:
+        print("No request")
         break
     if doBooleanRequest == 1:
         try:
@@ -160,6 +161,7 @@ while(doVectorialRequest):
     try:
         doVectorialRequest = int(input("Do you want to do a vectorial request ?[0/1]\n"))
     except ValueError:
+        print("No request")
         break
     if doVectorialRequest == 1:
         try:
@@ -174,4 +176,66 @@ while(doVectorialRequest):
         else:
             res =  vectorial_search.vectorial_search(query, collection_doc_nb, index, wordDic, False)
             print("Cela correspond aux documents :",res)
- 
+
+import os
+doEvaluation = 0
+try:
+    doEvaluation = int(input("Do you want to output evaluation parameters ?[0/1]\n"))
+except ValueError:
+    pass
+if doEvaluation:
+    with open('results/CACM_evaluation.txt', 'w+') as f:
+        f.write("Evaluation de la collection CACM\n")
+        f.write("\n# --------------------------------------\n# -- Performance\n# --------------------------------------\n")
+        f.write("Index created in {:.4f}s.\n".format(indexCreationTime))
+        try:
+            size = os.stat("results/CACM.txt").st_size/1000
+            f.write("Index size on disk {:.1f} kB.\n".format(size))
+        except:
+            f.write("Can not recover index size")
+        b_query1 = "AND construction development"
+        b_query2 = "AND medical OR information communication"
+        b_query3 = "OR AND surface reconstruction AND logic language"
+        b_query4 = "OR paper OR issue implementation"
+        b_query5 = "AND paper AND issue implementation"
+        f.write("\n")
+        f.write("# Boolean Search\n")
+        f.write("Query 1 ({}) answered in {:.6f}s.\n".format(b_query1,vectorial_search.vectorial_search(b_query1, collection_doc_nb, index, wordDic, True)[1]))
+        f.write("Query 2 ({}) answered in {:.6f}s.\n".format(b_query2,vectorial_search.vectorial_search(b_query2, collection_doc_nb, index, wordDic, True)[1]))
+        f.write("Query 3 ({}) answered in {:.6f}s.\n".format(b_query3,vectorial_search.vectorial_search(b_query3, collection_doc_nb, index, wordDic, True)[1]))
+        f.write("Query 4 ({}) answered in {:.6f}s.\n".format(b_query4,vectorial_search.vectorial_search(b_query4, collection_doc_nb, index, wordDic, True)[1]))
+        f.write("Query 5 ({}) answered in {:.6f}s.\n".format(b_query5,vectorial_search.vectorial_search(b_query5, collection_doc_nb, index, wordDic, True)[1]))
+        f.write("\n")
+        v_query1 = "construction development"
+        v_query2 = "medical information communication"
+        v_query3 = "surface reconstruction logic language"
+        v_query4 = "paper issue implementation"
+        f.write("# Vectorial Search\n")
+
+        # query 1
+        t_q1_tf_idf = vectorial_search.vectorial_search(v_query1, collection_doc_nb, index, wordDic, time_it=True, mode='tf-idf')[1]
+        t_q1_tf_idf_norm = vectorial_search.vectorial_search(v_query1, collection_doc_nb, index, wordDic, time_it=True, mode='tf-idf-norm')[1]
+        t_q1_freq_norm = vectorial_search.vectorial_search(v_query1, collection_doc_nb, index, wordDic, time_it=True, mode='freq-norm')[1]
+        f.write("Query 1 ({}) answered in:\n\t{:.4f}s for tf_idf,\n\t{:.4f}s for normalized tf-idf,\n\t{:.4f}s in normalized freqency.\n".format(v_query1,t_q1_tf_idf,t_q1_tf_idf_norm,t_q1_freq_norm))
+        
+        # query 2
+        t_q2_tf_idf = vectorial_search.vectorial_search(v_query2, collection_doc_nb, index, wordDic, time_it=True, mode='tf-idf')[1]
+        t_q2_tf_idf_norm = vectorial_search.vectorial_search(v_query2, collection_doc_nb, index, wordDic, time_it=True, mode='tf-idf-norm')[1]
+        t_q2_freq_norm = vectorial_search.vectorial_search(v_query2, collection_doc_nb, index, wordDic, time_it=True, mode='freq-norm')[1]
+        f.write("Query 1 ({}) answered in:\n\t{:.4f}s for tf_idf,\n\t{:.4f}s for normalized tf-idf,\n\t{:.4f}s in normalized freqency.\n".format(v_query2,t_q2_tf_idf,t_q2_tf_idf_norm,t_q2_freq_norm))
+        
+        # query 3
+        t_q3_tf_idf = vectorial_search.vectorial_search(v_query3, collection_doc_nb, index, wordDic, time_it=True, mode='tf-idf')[1]
+        t_q3_tf_idf_norm = vectorial_search.vectorial_search(v_query3, collection_doc_nb, index, wordDic, time_it=True, mode='tf-idf-norm')[1]
+        t_q3_freq_norm = vectorial_search.vectorial_search(v_query3, collection_doc_nb, index, wordDic, time_it=True, mode='freq-norm')[1]
+        f.write("Query 1 ({}) answered in:\n\t{:.4f}s for tf_idf,\n\t{:.4f}s for normalized tf-idf,\n\t{:.4f}s in normalized freqency.\n".format(v_query3,t_q3_tf_idf,t_q3_tf_idf_norm,t_q3_freq_norm))
+        
+        # query 4
+        t_q4_tf_idf = vectorial_search.vectorial_search(v_query4, collection_doc_nb, index, wordDic, time_it=True, mode='tf-idf')[1]
+        t_q4_tf_idf_norm = vectorial_search.vectorial_search(v_query4, collection_doc_nb, index, wordDic, time_it=True, mode='tf-idf-norm')[1]
+        t_q4_freq_norm = vectorial_search.vectorial_search(v_query4, collection_doc_nb, index, wordDic, time_it=True, mode='freq-norm')[1]
+        f.write("Query 1 ({}) answered in:\n\t{:.4f}s for tf_idf,\n\t{:.4f}s for normalized tf-idf,\n\t{:.4f}s in normalized freqency.\n".format(v_query4,t_q4_tf_idf,t_q4_tf_idf_norm,t_q4_freq_norm))
+        
+
+        f.write("\n# --------------------------------------\n# -- Pertinence\n# --------------------------------------\n")
+        
