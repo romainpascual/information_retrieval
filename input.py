@@ -114,4 +114,6 @@ def parse_queries(filename, common_words):
                 for word in words:
                     if word not in common_words:
                         queries[queryID].append(word)
+    for queryID, query in queries.items():
+        queries[queryID]= ' '.join(query)
     return queries
