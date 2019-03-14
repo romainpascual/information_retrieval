@@ -75,20 +75,22 @@ def vectorial_search(query: str, collection_size: int, index: dict, wordDic:dict
     timeBeginningRequest = time.time()
     result = dict()
     vectorial_query = dict()
+    sum_weight2_query = 0
     for word in set(query.split()):
         tf = query.split().count(word)
         dtf = get_inverse_document_frequency(wordDic[word], index)
-        vectorial_query[word] = get_word_weight(dtf,
-                                                collection_size,
-                                                wordDic[word],
-                                                None,
-                                                index,
-                                                mode=mode,
-                                                vectorization='query',
-                                                tf=tf)
-
+        word_weight_query = get_word_weight(dtf,
+                                            collection_size,
+                                            wordDic[word],
+                                            None,
+                                            index,
+                                            mode=mode,
+                                            vectorization='query',
+                                            tf=tf)
+        sum_weight2_query += word_weight_query**2
+        vectorial_query[word] = word_weight_query
     for document in range(collection_size):
-        sum_weight_doc = 0
+        sum_weight_doc_query = 0
         sum_weight2_doc = 0
         for word in query.split():
             word = word.lower()
@@ -99,13 +101,13 @@ def vectorial_search(query: str, collection_size: int, index: dict, wordDic:dict
                     return []
             dtf = get_inverse_document_frequency(wordDic[word], index)
             if document in [i for i, _ in index[wordDic[word]]]:
-                word_weight = get_word_weight(dtf, collection_size, wordDic[word], document, index, mode=mode)
-                sum_weight_doc += word_weight
-                sum_weight2_doc += word_weight**2
+                word_weight_document = get_word_weight(dtf, collection_size, wordDic[word], document, index, mode=mode)
+                sum_weight_doc_query += word_weight_document * vectorial_query[word]
+                sum_weight2_doc += word_weight_document**2
         if sum_weight2_doc == 0:
             result[document] = 0
         else:
-            result[document] = sum_weight_doc / math.sqrt(sum_weight2_doc)
+            result[document] = sum_weight_doc_query / (math.sqrt(sum_weight2_doc)*math.sqrt(sum_weight2_query))
     res = sorted(result.items(), key=lambda kv: kv[1], reverse=True)
     res = [k[0] for k in res[:15] if k[1] > 0]
     if time_it:
