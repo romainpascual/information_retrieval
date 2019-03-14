@@ -20,6 +20,24 @@ def linguistique_ligne(line, freq, common_words):
                 freq[word] = 1
     return token
 
+def linguistique_ligneCS276(line, freq, common_words, logT, logM, tokens):
+    """
+    Traitement linguistique pour une ligne
+    """
+    words = list(filter(None, re.split(r'[^a-z0-9]', line.lower())))
+    token = tokens
+    for word in words:
+        token += 1
+        if word not in common_words:
+            # maj frequence
+            try:
+                freq[word] += 1
+            except KeyError:
+                freq[word] = 1
+            logT.append(math.log10(token))
+            logM.append(math.log10(len(freq)))
+    return token
+
 def index_ligne(docID, line, index, wordDic, wordID, common_words):
     """
     Traitement d'une ligne pour la construction de l'index

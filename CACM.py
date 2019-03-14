@@ -58,6 +58,7 @@ if doLanguageProcessing == 1:
     print("Pour 1 000 000 de tokens, il y aurait {} mots de vocabulaire.".format(int(k*10e6**b)))
     plt.plot(logT, logM)
     plt.savefig("results/logT_vs_logM_CACM.png")
+    plt.show()
 
     freqList = list(freq.values())
     freqList.sort(reverse=True)
@@ -67,14 +68,14 @@ if doLanguageProcessing == 1:
 
     plt.plot(rangList,freqList)
     plt.savefig("results/freq_vs_rg_CACM.png")
-    #plt.show()
+    plt.show()
 
     logRang=[math.log10(k) for k in rangList]
     logFreq=[math.log10(f) for f in freqList]
 
     plt.plot(logRang, logFreq)
     plt.savefig("results/logFreq_vs_logRg_CACM.png")
-    #plt.show()
+    plt.show()
 
 print("*"*12)
 
@@ -115,6 +116,7 @@ for w_ID, docSet in index.items():
 timeEndIndexCreation = time.time()
 indexCreationTime = timeEndIndexCreation - timeBeginningIndexCreation
 print("Il a fallu {:.4f}s pour créer l'index.".format(indexCreationTime))
+print("il y a {} documents dans la collection".format(collection_doc_nb))
 
 # --------------------------------------
 # -- Sauvegarde de l'index
@@ -238,4 +240,5 @@ if doEvaluation:
         
 
         f.write("\n# --------------------------------------\n# -- Pertinence\n# --------------------------------------\n")
+        
         

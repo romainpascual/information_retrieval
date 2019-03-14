@@ -17,7 +17,7 @@ try:
 except ValueError:
     pass
 if doLanguageProcessing == 1:
-    from input import linguistique_ligne
+    from input import linguistique_ligneCS276, linguistique_ligne
 
     common_words = set()
     freq = dict()
@@ -30,9 +30,7 @@ if doLanguageProcessing == 1:
         for docID, filename in enumerate(tqdm(os.listdir('data/CS276/'+str(folder)),desc="Index {}".format(folder))):
             with open('data/CS276/'+str(folder)+'/'+filename, "r") as file:
                 line = file.readline()
-                token += linguistique_ligne(line, freq, common_words)
-                logT.append(math.log(token, 10))
-                logM.append(math.log(len(freq), 10))
+                token = linguistique_ligneCS276(line, freq, common_words, logT, logM, token)
 
     slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(logT[len(logT)//2:], logM[len(logM)//2:])
 
@@ -44,6 +42,7 @@ if doLanguageProcessing == 1:
     print("Pour 1 000 000 de tokens, il y aurait {} mots de vocabulaire.".format(int(k*10e6**b)))
     plt.plot(logT, logM)
     plt.savefig("results/logT_vs_logM_CS276.png")
+    plt.show()
 
     freqList = list(freq.values())
     freqList.sort(reverse=True)
@@ -53,14 +52,16 @@ if doLanguageProcessing == 1:
 
     plt.plot(rangList,freqList)
     plt.savefig("results/freq_vs_rg_CS276.png")
-    #plt.show()
+    plt.show()
 
     logRang=[math.log10(k) for k in rangList]
     logFreq=[math.log10(f) for f in freqList]
 
     plt.plot(logRang, logFreq)
     plt.savefig("results/logFreq_vs_logRg_CS276.png")
-    #plt.show()
+    plt.show()
+
+    #print(logT[:10], logM[:10])
 
 print("*"*12)
 
@@ -79,8 +80,6 @@ try:
 except ValueError:
     pass
 if doIndex == 1:
-    from input import vbe_index_ligne
-
     time_it = 0
     try:
         time_it = int(input("Do you want to time it ?[0/1]\n"))
@@ -90,6 +89,7 @@ if doIndex == 1:
     wordID = 0
     wordDic = dict()
     common_words = set()
+    global_docID = 1
     for folder in range(10):
         print("Création de l'index sur la collection CS276/{}.".format(folder))
         timeBeginningIndexCreation = time.time()
@@ -97,22 +97,23 @@ if doIndex == 1:
         for docID, filename in enumerate(tqdm(os.listdir('data/CS276/'+str(folder)),desc="Index {}".format(folder))):
             with open('data/CS276/'+str(folder)+'/'+filename, "r") as file:
                 line = file.readline()
-                wordID = index_ligne(docID, line, index, wordDic, wordID, common_words)
+                wordID = index_ligne(global_docID+docID, line, index, wordDic, wordID, common_words)
 
         # Nombre de documents dans la collection
         collection_doc_nb = docID+1
+        global_docID += collection_doc_nb
         # On obtient un index de la forme {mot: [(docId1, frequency1), (docId2, frequency2), ...]}
         # Cela répond à la question 2.2 pour CS276
         for w_ID, docSet in index.items():
             index[w_ID] = [(docID, freq) for docID,freq in docSet.items()]
             index[w_ID].sort(key=lambda x : x[0])
 
-
         timeEndIndexCreation = time.time()
 
         if time_it == 1:
             print("Il a fallu {:.4f}s pour créer l'index {}.".format(timeEndIndexCreation - timeBeginningIndexCreation, folder))
         print("Enregistrement de l'index {0} dans 'indexes/CS276_{0}.index'".format(folder))
+        print("il y a {} documents dans la sous-collection".format(collection_doc_nb))
         save_index(index, "CS276_{}".format(folder))
         print("-"*12)
     
@@ -150,6 +151,7 @@ if doIndex == 1:
     timeEndMerge = time.time() 
     if time_it == 1:
         print("Il a fallu {:.4f}s pour fusionner les blocs et former l'index.".format(timeEndMerge - timeBeginMerge))
+    print("il y a {} documents dans la collection".format(global_docID-1))
 
 # --------------------------------------
 # -- Sauvegarde de l'index
@@ -166,13 +168,13 @@ if doIndex == 1:
 # --------------------------------------
 # -- Création de l'index compressé
 # --------------------------------------
+from input import vbe_index_ligne
 doIndexCompression = 0
 try:
     doIndexCompression = int(input("Do you want to build the index with Variable Byte Encoding compression ?[0/1]\n"))
 except ValueError:
     pass
 if doIndexCompression == 1:
-    from input import vbe_index_ligne
 
     time_it = 0
     wordDic = dict()
@@ -234,11 +236,18 @@ if doIndexCompression == 1:
         pass
     if doIndexSaving == 1:
         from output import index_saving
-        index_saving('results/CS276_VBE.txt', "CS276", index, wordDic, withWordDic=False)
+        index_saving('results/CS276_DC.txt', "CS276", index, wordDic, withWordDic=False)
         print("index_saving done")
         from output import index_saving_vbe
-        index_saving_vbe('results/CS276_VBE_Test.dat', index, wordDic, withWordDic=False)
+        index_saving_vbe('results/CS276_VBE.dat', index, wordDic, withWordDic=False)
         print("index_saving_vbe done")
-        with open('results/CS276_VBE.index', 'wb+') as f:
+        with open('results/CS276_DC_Ser.index', 'wb+') as f:
             pickle.dump(index, f, pickle.HIGHEST_PROTOCOL)
         print("pickle done")
+
+    n = 0
+    for docSet in index.values():
+        n += 2 + len(docSet)
+    #print('Number of values stored in postings = {}, number of postings={}'.format(n, len(index)))
+    print("size={}".format(n))
+
