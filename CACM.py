@@ -4,6 +4,7 @@ import math
 from matplotlib import pyplot as plt
 import scipy.stats
 import time
+from tqdm import tqdm
 
 # --------------------------------------
 # -- Creation de Common Words
@@ -42,7 +43,7 @@ if doLanguageProcessing == 1:
             if line[0:2] in [".T", ".W", ".K"]:
                 reading = True
                 reading_authors = False
-            if line[0:2] == ".A":
+            elif line[0:2] == ".A":
                 reading = False
                 reading_authors = True
             elif line[0] == ".":
@@ -54,6 +55,8 @@ if doLanguageProcessing == 1:
                 logM.append(math.log(len(freq), 10))
             elif reading_authors:
                 token += linguistique_author()
+                logT.append(math.log(token, 10))
+                logM.append(math.log(len(freq), 10))
 
 
     slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(logT[len(logT)//2:], logM[len(logM)//2:])
@@ -110,7 +113,7 @@ with open("data/CACM/cacm.all", "r") as cacm:
         if line[0:2] in [".T", ".W", ".K"]:
             reading = True
             reading_authors = False
-        if line[0:2] == ".A":
+        elif line[0:2] == ".A":
             reading = False
             reading_authors = True
         elif line[0] == ".":
@@ -262,7 +265,7 @@ if doEvaluation:
     qrel_exp1 = dict()
     qrel_exp3 = dict()
     qrel_exp2 = dict()
-    for queryID, query in queries.items():
+    for queryID, query in tqdm(queries.items()):
         qrel_exp1[queryID] = vectorial_search.vectorial_search(query,
                                                               collection_doc_nb,
                                                               index, wordDic,
