@@ -61,7 +61,7 @@ def get_word_weight(document_frequency: int,
     if mode == 'freq-norm' and vectorization == 'query':
         mode = 'tf-idf-norm'
 
-    if vectorization == document:
+    if vectorization == 'document':
         tf = get_term_frequency(wordID, document, index)
     idf = math.log(collection_size / document_frequency, 10)
 
@@ -93,34 +93,36 @@ def vectorial_search(query: str, collection_size: int, index: dict, wordDic:dict
     timeBeginningRequest = time.time()
     result = dict()
     vectorial_query = dict()
-    for word in set(query.split()):
-        tf = query.split().count(word)
-        dtf = get_inverse_document_frequency(wordDic[word], index)
-        word_weight_query = get_word_weight(dtf,
-                                            collection_size,
-                                            wordDic[word],
-                                            None,
-                                            index,
-                                            mode=mode,
-                                            vectorization='query',
-                                            tf=tf)
-        sum_weight2_query += word_weight_query**2
+    sum_weight2_query = 0
+    for word in query.split():
+        word = word.lower()
+        tf = list(query.split()).count(word)
+        if word in wordDic:
+            dtf = get_inverse_document_frequency(wordDic[word], index)
+            word_weight_query = get_word_weight(dtf,
+                                                collection_size,
+                                                wordDic[word],
+                                                None,
+                                                index,
+                                                mode=mode,
+                                                vectorization='query',
+                                                tf=tf)
+            sum_weight2_query += word_weight_query**2
+        else:
+            word_weight_query = 0
         vectorial_query[word] = word_weight_query
     for document in range(collection_size):
         sum_weight_doc_query = 0
         sum_weight2_doc = 0
         for word in query.split():
             word = word.lower()
-            if word not in wordDic:
-                if time_it:
-                    return [], time.time() - timeBeginningRequest
-                else:
-                    return []
-            dtf = get_inverse_document_frequency(wordDic[word], index)
-            if document in [i for i, _ in index[wordDic[word]]]:
-                word_weight_document = get_word_weight(dtf, collection_size, wordDic[word], document, index, mode=mode)
-                sum_weight_doc_query += word_weight_document * vectorial_query[word]
-                sum_weight2_doc += word_weight_document**2
+            if word in wordDic:
+                dtf = get_inverse_document_frequency(wordDic[word], index)
+                docList = [i for i, _ in index[wordDic[word]]]
+                if document in docList:
+                    word_weight_document = get_word_weight(dtf, collection_size, wordDic[word], document, index, mode=mode)
+                    sum_weight_doc_query += word_weight_document * vectorial_query[word]
+                    sum_weight2_doc += word_weight_document**2
         if sum_weight2_doc == 0:
             result[document] = 0
         else:
