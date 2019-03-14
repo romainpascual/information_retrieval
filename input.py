@@ -79,9 +79,18 @@ def vbe_index_ligne(docID, line, index, wordDic, wordID):
         try:
             index[w_ID].add(docID)
         except KeyError:
-                index[w_ID] = set([docID])
+                index[w_ID] = {docID}
     
     return wordID
- 
- def parse_qrel(filename):
-     pass
+
+
+def parse_qrel(filename):
+    parsed_qrel = dict()
+    with open(filename, 'r') as f:
+        for line in f:
+            query, document, _, _ = (int(el) for el in line.split())
+            if query in parsed_qrel:
+                parsed_qrel[query].append(document)
+            else:
+                parsed_qrel[query] = [document]
+    return parsed_qrel
