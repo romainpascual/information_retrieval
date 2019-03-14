@@ -44,13 +44,28 @@ def get_inverse_document_frequency(wordID: int, index: dict):
     return len(index[wordID])
 
 
-def get_word_weight(document_frequency: int, collection_size: int, wordID:int, document:int , index: dict, mode='tf-idf'):
+def get_word_weight(document_frequency: int,
+                    collection_size: int,
+                    wordID: int,
+                    document,
+                    index: dict,
+                    mode='tf-idf',
+                    vectorization='document',
+                    tf=None):
     """
     mode = 'tf-idf'
     mode = 'tf-idf-norm'
     mode = 'freq-norm'
+    vectorization = 'document' for corpus vectorization
+    vectorization = 'query' for query vectorization
+    query = query if in query vectorization
+
     """
-    tf = get_term_frequency(wordID, document, index)
+    if mode == 'freq-norm' and vectorization == 'query':
+        mode = 'tf-idf-norm'
+
+    if vectorization == document:
+        tf = get_term_frequency(wordID, document, index)
     idf = math.log(collection_size / document_frequency, 10)
 
     if mode == 'tf-idf':
@@ -80,6 +95,19 @@ def vectorial_search(query: str, collection_size: int, index: dict, wordDic:dict
     
     timeBeginningRequest = time.time()
     result = dict()
+    vectorial_query = dict()
+    for word in set(query.split()):
+        tf = query.split().count(word)
+        dtf = get_inverse_document_frequency(wordDic[word], index)
+        vectorial_query[word] = get_word_weight(dtf,
+                                                collection_size,
+                                                wordDic[word],
+                                                None,
+                                                index,
+                                                mode=mode,
+                                                vectorization='query',
+                                                tf=tf)
+
     for document in range(collection_size):
         sum_weight_doc = 0
         sum_weight2_doc = 0
@@ -92,7 +120,7 @@ def vectorial_search(query: str, collection_size: int, index: dict, wordDic:dict
                     return []
             dtf = get_inverse_document_frequency(wordDic[word], index)
             if document in [i for i, _ in index[wordDic[word]]]:
-                word_weight = get_word_weight(dtf, collection_size, wordDic[word], document, index)
+                word_weight = get_word_weight(dtf, collection_size, wordDic[word], document, index, mode=mode)
                 sum_weight_doc += word_weight
                 sum_weight2_doc += word_weight**2
         if sum_weight2_doc == 0:
