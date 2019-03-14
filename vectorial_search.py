@@ -80,7 +80,7 @@ def get_word_weight(document_frequency: int,
         return tf / max_tf
 
 
-def vectorial_search(query: str, collection_size: int, index: dict, wordDic:dict, time_it = False, mode='tf-idf'):
+def vectorial_search(query: str, collection_size: int, index: dict, wordDic:dict, time_it = False, mode='tf-idf', size=50):
     """
     Vectorial search algorithm implementation.
     :param query: list of K query terms
@@ -129,7 +129,7 @@ def vectorial_search(query: str, collection_size: int, index: dict, wordDic:dict
         else:
             result[document] = sum_weight_doc_query / (math.sqrt(sum_weight2_doc)*math.sqrt(sum_weight2_query))
     res = sorted(result.items(), key=lambda kv: kv[1], reverse=True)
-    res = [k[0] for k in res[:15] if k[1] > 0]
+    res = [k[0] for k in res[:size] if k[1] > 0]
     if time_it:
         return res, time.time() - timeBeginningRequest
     else:

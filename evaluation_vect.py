@@ -13,15 +13,9 @@ def precision_recall(found, pertinents):
         recall = pertinent_found / len(pertinents)
         precision = pertinent_found / (k+1)
         precision_recall.append([recall, precision])
-    print("pr :", precision_recall)
-    a = set(found)
-    b = set(pertinents)
-    c = set.intersection(a,b)
-    print("intersection :",c)
     return precision_recall
 
-def plot_precision_recall(found, pertinents):
-    p_r = precision_recall(found, pertinents)
+def plot_precision_recall(p_r,filename):
     p_r.sort(key=lambda x : x[0])
 
     x = []
@@ -29,6 +23,10 @@ def plot_precision_recall(found, pertinents):
 
     for k in range(len(p_r)-1):
         to_keep = True
+        for l in range(k):
+            if p_r[l][1] == p_r[k][1]:
+                to_keep = False
+                break
         for l in range(k,len(p_r)):
             if p_r[l][1] > p_r[k][1] :
                 to_keep = False
@@ -36,9 +34,12 @@ def plot_precision_recall(found, pertinents):
         if to_keep:
             x.append(p_r[k][0])
             y.append(p_r[k][1])
-
-    plt.plot(x,y)
-    plt.show()
+    print(x,y)
+    plt.step(x,y)
+    plt.xlim(0,1)
+    plt.ylim(0,1)
+    plt.savefig('precision_recall/'+filename)
+    plt.clf()
 
 def E_measure(precision, recall, alpha=-1):
     if alpha == -1:
@@ -47,8 +48,7 @@ def E_measure(precision, recall, alpha=-1):
     E = 1 - 1/( alpha/precision + (1-alpha)/recall)
     return E
 
-def E_measure_mean(found, pertinents):
-    p_r = precision_recall(found, pertinents)
+def E_measure_mean(p_r):
     total_E = 0
     for [precision,recall] in p_r:
         total_E += E_measure(precision,recall)
@@ -57,14 +57,16 @@ def E_measure_mean(found, pertinents):
 def F_measure(precision, recall, alpha=-1):
     return 1 - E_measure(precision, recall, alpha)
 
-def F_measure_mean(found, pertinents):
-    p_r = precision_recall(found, pertinents)
+def F_measure_mean(p_r):
     total_F = 0
     for [precision,recall] in p_r:
         total_F += F_measure(precision,recall)
     return total_F / len(p_r)
 
-def R_precision(x):
-    """
+def process_answer(found, pertinents, filename):
+    p_r = precision_recall(found,pertinents)
+    plot_precision_recall(p_r,filename)
+    E = E_measure_mean(p_r)
+    F = F_measure_mean(p_r)
 
-    """
+    return E,F
