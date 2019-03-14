@@ -243,14 +243,28 @@ if doEvaluation:
         f.write("\n# --------------------------------------\n# -- Pertinence\n# --------------------------------------\n")
 
     queries = parse_queries('data/CACM/query.text', common_words)
-    qrel_exp = dict()
+    qrel_exp1 = dict()
+    qrel_exp3 = dict()
+    qrel_exp2 = dict()
     for queryID, query in queries.items():
-        qrel_exp[queryID] = vectorial_search.vectorial_search(query, collection_doc_nb, index, wordDic, False)
+        qrel_exp1[queryID] = vectorial_search.vectorial_search(query,
+                                                              collection_doc_nb,
+                                                              index, wordDic,
+                                                              time_it=False,
+                                                              mode='tf-idf')
+        qrel_exp2[queryID] = vectorial_search.vectorial_search(query,
+                                                              collection_doc_nb,
+                                                              index, wordDic,
+                                                              time_it=False,
+                                                              mode='tf-idf-norm')
+        qrel_exp3[queryID] = vectorial_search.vectorial_search(query,
+                                                              collection_doc_nb,
+                                                              index, wordDic,
+                                                              time_it=False,
+                                                              mode='freq-norm')
 
     qrel_real = parse_qrel('data/CACM/qrels.text')
-    
-    from evaluation_vect import plot_precision_recall
-    for query, answer in qrel_real.items():
-        if len(answer)>0:
-            print(answer, qrel_real[query])
-            plot_precision_recall(answer, qrel_real[query])
+    print('QREL EXP\n', qrel_exp1)
+    print('QREL EXP\n', qrel_exp2)
+    print('QREL EXP\n', qrel_exp3)
+    print('QREL REAL\n', qrel_real)
