@@ -69,8 +69,6 @@ def boolean_search(query: str, collection_size: int, index: dict, wordDic:dict, 
     :param time_it: boolean to enable performance measures
     :return:
     """
-
-    print(time_it)
     request = query.split()
 
     if time_it:

@@ -31,10 +31,11 @@ def get_term_frequency(wordID: int, document: int, index: dict):
 def get_max_term_frequency(document:int, index:dict):
     max_tf = 0
     for docSet in index.values():
-        if docSet[0] == document:
-            tf = docSet[1]
-            if tf > max_tf:
-                max_tf = tf
+        for doc in docSet:
+            if doc[0] == document:
+                tf = doc[1]
+                if tf > max_tf:
+                    max_tf = tf
     return max_tf
 
 def get_inverse_document_frequency(wordID: int, index: dict):

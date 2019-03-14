@@ -16,7 +16,7 @@ def precision_recall(found, pertinents):
     print("pr :", precision_recall)
     a = set(found)
     b = set(pertinents)
-    c = set.union(a,b)
+    c = set.intersection(a,b)
     print("intersection :",c)
     return precision_recall
 

@@ -283,7 +283,13 @@ if doEvaluation:
                                                               mode='freq-norm')
 
     qrel_real = parse_qrel('data/CACM/qrels.text')
+    """
     print('QREL EXP\n', qrel_exp1)
     print('QREL EXP\n', qrel_exp2)
     print('QREL EXP\n', qrel_exp3)
     print('QREL REAL\n', qrel_real)
+    """
+    import evaluation_vect
+    for query, answer in qrel_exp1.items():
+        if len(answer) > 0:
+            evaluation_vect.plot_precision_recall(answer, qrel_real[query])
