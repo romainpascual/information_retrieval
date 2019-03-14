@@ -3,6 +3,27 @@ import math, time
 """
 Implement vectorial search
 """
+def build_vect_space(index:dict, wordDic:dict, collection_size:int):
+    modes = ['tf-idf', 'tf-idf-norm', 'freq-norm']
+    vect_space = dict()
+    for docID in wordDic.values():
+        vect_weights = dict()
+        for wordID in index.keys():
+            mode_weight = dict()
+            to_add = False
+            for m in modes:
+                dtf = get_inverse_document_frequency(wordID, index)
+                w = get_word_weight(dtf, collection_size, wordID, docID, index, m)
+                if w != 0:
+                    to_add = True
+                mode_weight[m] = m
+            if to_add:
+                vect_weights[wordID] = mode_weight
+        vect_space[docID] = vect_weights
+    return vect_space
+
+            
+
 
 def get_term_frequency(wordID: int, document: int, index: dict):
     try:
