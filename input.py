@@ -4,6 +4,7 @@ Fonctions auxiliaires pour le traitement des données
 
 import re, math
 
+
 def linguistique_ligne(line, freq, common_words):
     """
     Traitement linguistique pour une ligne
@@ -19,6 +20,7 @@ def linguistique_ligne(line, freq, common_words):
             except KeyError:
                 freq[word] = 1
     return token
+
 
 def linguistique_ligneCS276(line, freq, common_words, logT, logM, tokens):
     """
@@ -37,6 +39,7 @@ def linguistique_ligneCS276(line, freq, common_words, logT, logM, tokens):
             logT.append(math.log10(token))
             logM.append(math.log10(len(freq)))
     return token
+
 
 def index_ligne(docID, line, index, wordDic, wordID, common_words):
     """
@@ -62,6 +65,7 @@ def index_ligne(docID, line, index, wordDic, wordID, common_words):
                 index[w_ID] = {docID:1}
     
     return wordID
+
 
 def vbe_index_ligne(docID, line, index, wordDic, wordID):
     """
@@ -91,3 +95,23 @@ def parse_qrel(filename):
             query, document, _, _ = (int(el) for el in line.split())
             parsed_qrel.setdefault(query, []).append(document)
     return parsed_qrel
+
+
+def parse_queries(filename, common_words):
+    queries = dict()
+    reading = False
+    with open(filename, "r") as f:
+        for line in f:
+            if line[0:2] == ".I":
+                queryID = int(line.split(' ')[1])
+                queries[queryID] = []
+            if line[0:2] == ".W":
+                reading = True
+            elif line[0] == ".":
+                reading = False
+            elif reading:
+                words = list(filter(None, re.split(r'[^a-z0-9/]', line.lower())))
+                for word in words:
+                    if word not in common_words:
+                        queries[queryID].append(word)
+    return queries
