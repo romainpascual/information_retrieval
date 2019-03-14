@@ -42,9 +42,9 @@ Il s’agit ici de mettre en place l’ensemble des traitements utiles vus en co
 donné en une liste de termes d’index.
 
 \subsection{Traitement linguistique}
-Les étapes de traiements linguistiques sont au nombre de trois : la tokénisation, la comparaison avec une stop-liste et la lemmatisation. Toutefois ces trois étapes sont ici simplifiées. Ainsi, on limite l'étape de tokénisation à considérer tout caractère non alpha-numérique comme un séparateur de mots. Cette étape est donc simplement réalisées en utilisant des expressions régulières. La comparaison avec une stop-liste est effectuée sur la première collection (puisqu'une stop liste est fournie) mais pas sur la seconde. Par ailleurs cette étape est précédé d'une transformation de tous les caractères alphabétique en minuscule. Enfin l'étape de lemmatisation ou troncature est ici négligée.
+Les étapes de traitements linguistiques sont au nombre de trois : la tokénisation, la comparaison avec une stop-liste et la lemmatisation. Toutefois ces trois étapes sont ici simplifiées. Ainsi, on limite l'étape de tokénisation à considérer tout caractère non alpha-numérique comme un séparateur de mots. Cette étape est donc simplement réalisées en utilisant des expressions régulières. La comparaison avec une stop-liste est effectuée sur la première collection (puisqu'une stop liste est fournie) mais pas sur la seconde. Par ailleurs cette étape est précédé d'une transformation de tous les caractères alphabétique en minuscule. Enfin l'étape de lemmatisation ou troncature est ici négligée dans la collection CACM (la lemmatisation étant déjà effectuée pour la collection CS276).
 
-\paragraph{Collection CACM} Dans le cas de cette collection, un fichier unique contient l'ensemble des documents. Les documents sont séparés par un ensemble de marqueurs et contiennent plusieurs champs eux-même identifiés par des marqueurs. Dans le cadre de ce projet, on se limite aux marqueurs des champs correspondant à l'identifiant, le titre, le résumé et les mots clefs relatifs aux documents.
+\paragraph{Collection CACM} Dans le cas de cette collection, un fichier unique contient l'ensemble des documents. Les documents sont séparés par un ensemble de marqueurs et contiennent plusieurs champs eux-même identifiés par des marqueurs. Dans le cadre de ce projet, on se limite aux marqueurs des champs correspondant à l'identifiant, le titre, le résumé et les mots clefs relatifs aux documents. Bien que non demandé dans l'énoncé, nous avons choisi d'inclure les noms de familles des champs d'auteurs, car plusieurs des requêtes étudiée plus tard dans l'étape d'évaluation nécessitent les auteurs.
 
 Le traitement linguistique ainsi effectué nous permet de trouver $192129$ tokens dans la collection (\textbf{Question 1}), pour une taille de vocabulaire de $9496$ mots (\textbf{Question 2}).
 
@@ -56,7 +56,7 @@ où $M$ est le nombre de tokens et $T$ la taille du vocabulaire (\textbf{Questio
 
 On peut alors estimer à $62679$ la taille du vocabulaire pour une collection de $1$ million de tokens (\textbf{Question 4}).
 
-On peut, de plus, tracer les graphes frequence $f$ vs rang $r$ (figure \ref{fig:CACM_fvsr}) et $log(f)$ vs $log(r)$ (figure \ref{fig:CACM_logfvslogr} pour tous les tokens de la collection (\textbf{Question 5}).
+On peut, de plus, tracer les graphes fréquence $f$ vs rang $r$ (figure \ref{fig:CACM_fvsr}) et $log(f)$ vs $log(r)$ (figure \ref{fig:CACM_logfvslogr} pour tous les tokens de la collection (\textbf{Question 5}).
 
 \begin{figure}[htbp]
 \centering
@@ -76,7 +76,7 @@ On peut, de plus, tracer les graphes frequence $f$ vs rang $r$ (figure \ref{fig:
 
 \paragraph{Collection CS276} Dans cette collection, les documents ont déjà été pré-traités et ne contiennent que des séquences de mots.
 
-On peut alors effetuer le même traitement linguistique, ce qui permet de trouver $25578547$ tokens dans la collection (\textbf{Question 1}), pour une taille de vocabulaire de $310162$ mots (\textbf{Question 2}).
+On peut effectuer le même traitement linguistique, ce qui permet de trouver $25578547$ tokens dans la collection (\textbf{Question 1}), pour une taille de vocabulaire de $310162$ mots (\textbf{Question 2}).
 
 Par régression linéaire, on obtient les paramètres ($k \simeq 0.05$ et $b \simeq 0.91$) de la loi de Heap :
 
@@ -84,9 +84,9 @@ Par régression linéaire, on obtient les paramètres ($k \simeq 0.05$ et $b \si
 
 où $M$ est le nombre de tokens et $T$ la taille du vocabulaire (\textbf{Question 3}).
 
-On peut alors estimer à $142631$ la taille du vocabulaire pour une collection de $1$ million de tokens (\textbf{Question 4}).
+On peut alors estimer à $142631$ la taille du vocabulaire pour une collection de $1$ millions de tokens (\textbf{Question 4}).
 
-On peut, de plus, tracer les graphes frequence $f$ vs rang $r$ (figure \ref{fig:CS276_fvsr}) et $log(f)$ vs $log(r)$ (figure \ref{fig:CS276_logfvslogr} pour tous les tokens de la collection (\textbf{Question 5}).
+On peut, de plus, tracer les graphes fréquence $f$ vs rang $r$ (figure \ref{fig:CS276_fvsr}) et $log(f)$ vs $log(r)$ (figure \ref{fig:CS276_logfvslogr} pour tous les tokens de la collection (\textbf{Question 5}).
 
 \begin{figure}[htbp]
 \centering
@@ -105,7 +105,7 @@ On peut, de plus, tracer les graphes frequence $f$ vs rang $r$ (figure \ref{fig:
 \end{figure}
 
 \subsection{Indexation}
-Il reste maintenant à créer les indexes. Pour cela nous avons décider d'utiliser des tables de hachage, aussi bien pour le dictionnaire (terme, termeID) que pour l'index en lui-même. Puisque les documents sont déjà référencés à l'aide l'un identifiant unique dans la collection CACM, le dictionnaire (document, documentID) n'est pas nécessaire. Enfin, afin de pouvoir mener à bien la recherche vectorielle, il est nécessaire de garder la fréquence d'un terme dans un document, nous avons majoritairement utiliser un index où la liste de postings contient un couple (documentID, freq) et pas simplement l'identifiant du document. Notons que la collection CACM est petite et l’index peut être construit directement en mémoire. En revanche la collection CS276 est considérée comme $10$ blocs indépendants et nous avons utiliser l'algorithme SPIMI (ou Single Pass In Memory Indexing). Les résultats intermédiaires sont stockés dans le dossier "indexes".
+Il reste maintenant à créer les indexes. Pour cela nous avons décider d'utiliser des tables de hachage, aussi bien pour le dictionnaire (terme, termeID) que pour l'index en lui-même. Puisque les documents sont déjà référencés à l'aide d'un identifiant unique dans la collection CACM, le dictionnaire (document, documentID) n'est pas nécessaire. Enfin, afin de pouvoir mener à bien la recherche vectorielle, il est nécessaire de garder la fréquence d'un terme dans un document, nous avons majoritairement utilisé un index où la liste de postings contient un couple (documentID, freq) et pas simplement l'identifiant du document. Notons que la collection CACM est petite et l’index peut être construit directement en mémoire. En revanche la collection CS276 est considérée comme $10$ blocs indépendants et nous avons utilisé l'algorithme SPIMI (ou Single Pass In Memory Indexing). Les résultats intermédiaires sont stockés dans le dossier \texttt{indexes}.
 
 \paragraph{Modèle de recherche booléen} Dans ce modèle, la requête est donnée sous la forme d'une expression booléenne. Les opérateurs acceptés sont la conjonction $\wedge$ (et), la disjonction $\vee$ (ou) et la négation $\neg$ (non).
 
@@ -132,14 +132,14 @@ Pour des recherches vectorielles (avec les trois pondérations), le temps de ré
 
 \paragraph{Mesure de pertinence}
 
-\noindent \textsc{Remarque} : il est possible d'exécuter l'évaluation de la collection, ce qui créera un fichier \texttt{CACM\_evaluation} dans le dossier results avec des résultats d'évaluation un peu plus détaillés.
+\noindent \textsc{Remarque} : il est possible d'exécuter l'évaluation de la collection, ce qui créera un fichier \texttt{CACM\_evaluation} dans le dossier \texttt{results} avec des résultats d'évaluation un peu plus détaillés.
 
 \section{Création d’un index inversé compressé}
-Il s'agit ici d'implémenter la méthode de compression Variable Byte encoding pour la collection CS276.
+Il s'agit ici d'implémenter la méthode de compression Variable Byte Encoding pour la collection CS276.
 
-Tout d'abord, on utilise la méthode Delta Coding qui consiste à stocker la différence entre deux documentID consécutifs dans la liste de posting plutôt que leur valeur. Il convient ensuite d'implémenter la méthode de Variable Byte Encoding qui consiste à coder sur moins de bit les plus petits entiers et sur plus de bits les plus grands. Plus précisément on code sur un octet les restes consécutifs de la division euclidienne par $128$ avec le premier bit qui sert à spécifier si l'octet suivant correspond toujours à l'entier en cours. Il devient alors difficile d'utiliser un délimiteur dans les listes de posting. Ainsi une liste est stockée en spécifiant d'abord le nombre d'élements puis ces éléments énumérés un par un. Ainsi lorsque l'on a lu suffisemment de valeur on sait que l'on a lu tout la liste.
+Tout d'abord, on utilise la méthode Delta Coding qui consiste à stocker la différence entre deux documentID consécutifs dans la liste de posting plutôt que leur valeur. Il convient ensuite d'implémenter la méthode de Variable Byte Encoding qui consiste à coder sur moins de bit les plus petits entiers et sur plus de bits les plus grands. Plus précisément on code sur un octet les restes consécutifs de la division euclidienne par $128$ avec le premier bit qui sert à spécifier si l'octet suivant correspond toujours à l'entier en cours. Il devient alors difficile d'utiliser un délimiteur dans les listes de posting. Ainsi une liste est stockée en spécifiant d'abord le nombre d'éléments puis ces éléments énumérés un par un. Ainsi lorsque l'on a lu suffisamment de valeur on sait que l'on a lu tout la liste.
 
-Par ailleurs, nous avons aussi essayé d'utiliser pickle qui est un module de sérialisation python pour avoir un élément de comparaison avec la compression VBE.
+Par ailleurs, nous avons aussi essayé d'utiliser \texttt{pickle} qui est un module de sérialisation Python pour avoir un élément de comparaison avec la compression VBE.
 
 \begin{table}[h]
 \centering
@@ -152,8 +152,14 @@ Delta Coding + Serialisation (pickle)                 & CS276\_DC\_Ser.index & 3
 \end{tabular}
 \end{table}
 
-On remarque que la sérialisation diminue légèrement la taille du dossier mais que l'implémen-tation de VBE n'est pas très satisfaisante. Cela provient du fait que stocker un entier sur un octet n'est en effet pas très pertient. On peut exemple noter que l'index comprend $13769488$ valeurs stockées dans $310162$ liste de posting. Si on moyenne le nombre de bits pour les termeID's entre $0$ et $310162$, on obtient $\sim24$, ce qui correspond à $3$ octets. Avec $13769488$ valeurs stockées dans $310162$ liste de posting, on obtient $45$ éléments en moyenne par liste de posting, ce qui tient sur un octet. Etant donné que la collection comporte $98998$ documents, en moyenne un documentID se stock sur $\sim22$ bits, i.e. $3$ octets. On obtient alors une estimation à $167$Mo de la taille du fichier. Le fichier réel possède une taille de $139.7$Mo ce qui peut signifier que le Delta Code est peu efficace. Toutefois, cela ne semble pas etre le cas lorsque l'on compare les fichiers stockés en string avec et sans Delta Code, on obtient une réduction par $3$ de la taille du fichier. Enfin le fichier avec Delta Coding et Variable Byte Encoding est plus lourd en mémoire que l'index d'orgine. Il y a donc probablement une erreur dans notre gestion des valeurs sous forme de bits.
+On remarque que la sérialisation diminue légèrement la taille du dossier mais que l'implé\-mentation de VBE n'est pas très satisfaisante. Cela provient du fait que stocker un entier sur un octet n'est en effet pas très pertinent. On peut par exemple noter que l'index comprend $13769488$ valeurs stockées dans $310162$ liste de posting. Si on moyenne le nombre de bits pour les termeIDs entre $0$ et $310162$, on obtient $\sim24$, ce qui correspond à $3$ octets. Avec $13769488$ valeurs stockées dans $310162$ liste de posting, on obtient $45$ éléments en moyenne par liste de posting, ce qui tient sur un octet. Étant donné que la collection comporte $98998$ documents, en moyenne un documentID se stocke sur $\sim22$ bits, c-à-d $3$ octets.
 
-\noindent \textsc{Remarque} : il est possible d'obtenir ces trois fichiers dans le dossier results en exécutant le code correspondant à la collection CS276.
+On obtient alors une estimation à $167$Mo de la taille du fichier. Le fichier réel a une taille de $139.7$Mo ce qui peut signifier que le Delta Code est peu efficace.
+
+Toutefois, cela ne semble pas être le cas lorsque l'on compare les fichiers stockés en string avec et sans Delta Code, on obtient une réduction par $3$ de la taille du fichier.
+
+Enfin le fichier avec Delta Coding et Variable Byte Encoding est plus lourd en mémoire que l'index d'origine. Il y a donc probablement une erreur dans notre gestion des valeurs sous forme de bits.
+
+\noindent \textsc{Remarque} : il est possible d'obtenir ces trois fichiers dans le dossier \texttt{results} en exécutant le code correspondant à la collection CS276.
 
 \end{document}
