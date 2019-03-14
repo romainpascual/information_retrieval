@@ -22,6 +22,18 @@ def linguistique_ligne(line, freq, common_words):
     return token
 
 
+def linguistique_author(line, freq, common_words):
+    """
+    Traitement linguistique pour une ligne d'auteur
+    """
+    author = line.split(',')[0].lower()
+    try:
+        freq[author] += 1
+    except KeyError:
+        freq[author] = 1
+    return author
+
+
 def linguistique_ligneCS276(line, freq, common_words, logT, logM, tokens):
     """
     Traitement linguistique pour une ligne
@@ -64,6 +76,28 @@ def index_ligne(docID, line, index, wordDic, wordID, common_words):
             except KeyError:
                 index[w_ID] = {docID:1}
     
+    return wordID
+
+
+def index_author(docID, line, index, wordDic, wordID, common_words):
+    """
+    Traitement d'une ligne d'auteur pour la construction de l'index
+    """
+    author = line.split(',')[0].lower()
+    if author not in wordDic:
+        wordDic[author] = wordID
+        wordID += 1
+
+        # maj indexß
+    w_ID = wordDic[author]
+    try:
+        if docID in index[w_ID]:
+            index[w_ID][docID] += 1
+        else:
+            index[w_ID][docID] = 1
+    except KeyError:
+        index[w_ID] = {docID: 1}
+
     return wordID
 
 
