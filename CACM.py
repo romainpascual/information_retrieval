@@ -23,13 +23,14 @@ try:
 except ValueError:
     pass
 if doLanguageProcessing == 1:
-    from input import linguistique_ligne
+    from input import linguistique_ligne, linguistique_author
 
     freq = dict()
     token = 0
     logT = []
     logM = []
     reading = False
+    reading_authors = False
 
     with open("data/CACM/cacm.all", "r") as cacm:
         while True:
@@ -40,12 +41,19 @@ if doLanguageProcessing == 1:
                 docID = int(line.split(' ')[1])
             if line[0:2] in [".T", ".W", ".K"]:
                 reading = True
+                reading_authors = False
+            if line[0:2] == ".A":
+                reading = False
+                reading_authors = True
             elif line[0] == ".":
                 reading = False
+                reading_authors = False
             elif reading:
                 token += linguistique_ligne(line, freq, common_words)
                 logT.append(math.log(token, 10))
                 logM.append(math.log(len(freq), 10))
+            elif reading_authors:
+                token += linguistique_author()
 
 
     slope, intercept, r_value, p_value, std_err = scipy.stats.linregress(logT[len(logT)//2:], logM[len(logM)//2:])
@@ -83,10 +91,11 @@ print("*"*12)
 # -- Création de l'index
 # --------------------------------------
 print("Index creation --")
-from input import index_ligne
+from input import index_ligne, index_author
 
 timeBeginningIndexCreation = time.time()
 reading = False
+reading_authors = False
 index = dict()
 wordDic = dict()
 wordID = 0
@@ -100,10 +109,17 @@ with open("data/CACM/cacm.all", "r") as cacm:
             docID = int(line.split(' ')[1])
         if line[0:2] in [".T", ".W", ".K"]:
             reading = True
+            reading_authors = False
+        if line[0:2] == ".A":
+            reading = False
+            reading_authors = True
         elif line[0] == ".":
             reading = False
+            reading_authors = False
         elif reading:
             wordID = index_ligne(docID, line, index, wordDic, wordID, common_words)
+        elif reading_authors:
+            wordID = index_author(docID, line, index, wordDic, wordID, common_words)
 
 # Nombre de documents dans la collection
 collection_doc_nb = docID+1
