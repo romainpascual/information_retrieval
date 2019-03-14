@@ -203,11 +203,11 @@ if doEvaluation:
         b_query5 = "AND paper AND issue implementation"
         f.write("\n")
         f.write("# Boolean Search\n")
-        f.write("Query 1 ({}) answered in {:.6f}s.\n".format(b_query1,vectorial_search.vectorial_search(b_query1, collection_doc_nb, index, wordDic, True)[1]))
-        f.write("Query 2 ({}) answered in {:.6f}s.\n".format(b_query2,vectorial_search.vectorial_search(b_query2, collection_doc_nb, index, wordDic, True)[1]))
-        f.write("Query 3 ({}) answered in {:.6f}s.\n".format(b_query3,vectorial_search.vectorial_search(b_query3, collection_doc_nb, index, wordDic, True)[1]))
-        f.write("Query 4 ({}) answered in {:.6f}s.\n".format(b_query4,vectorial_search.vectorial_search(b_query4, collection_doc_nb, index, wordDic, True)[1]))
-        f.write("Query 5 ({}) answered in {:.6f}s.\n".format(b_query5,vectorial_search.vectorial_search(b_query5, collection_doc_nb, index, wordDic, True)[1]))
+        f.write("Query 1 ({}) answered in {:.6f}s.\n".format(b_query1,boolean_search.boolean_search(b_query1, collection_doc_nb, index, wordDic, True)[1]))
+        f.write("Query 2 ({}) answered in {:.6f}s.\n".format(b_query2,boolean_search.boolean_search(b_query2, collection_doc_nb, index, wordDic, True)[1]))
+        f.write("Query 3 ({}) answered in {:.6f}s.\n".format(b_query3,boolean_search.boolean_search(b_query3, collection_doc_nb, index, wordDic, True)[1]))
+        f.write("Query 4 ({}) answered in {:.6f}s.\n".format(b_query4,boolean_search.boolean_search(b_query4, collection_doc_nb, index, wordDic, True)[1]))
+        f.write("Query 5 ({}) answered in {:.6f}s.\n".format(b_query5,boolean_search.boolean_search(b_query5, collection_doc_nb, index, wordDic, True)[1]))
         f.write("\n")
         v_query1 = "construction development"
         v_query2 = "medical information communication"
