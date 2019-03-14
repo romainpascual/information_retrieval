@@ -89,8 +89,5 @@ def parse_qrel(filename):
     with open(filename, 'r') as f:
         for line in f:
             query, document, _, _ = (int(el) for el in line.split())
-            if query in parsed_qrel:
-                parsed_qrel[query].append(document)
-            else:
-                parsed_qrel[query] = [document]
+            parsed_qrel.setdefault(query, []).append(document)
     return parsed_qrel
