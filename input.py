@@ -82,3 +82,6 @@ def vbe_index_ligne(docID, line, index, wordDic, wordID):
                 index[w_ID] = set([docID])
     
     return wordID
+ 
+ def parse_qrel(filename):
+     pass
