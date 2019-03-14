@@ -180,6 +180,7 @@ while(doVectorialRequest):
             print("Cela correspond aux documents :",res)
 
 import os
+from input import parse_queries, parse_qrel
 doEvaluation = 0
 try:
     doEvaluation = int(input("Do you want to output evaluation parameters ?[0/1]\n"))
@@ -219,26 +220,33 @@ if doEvaluation:
         t_q1_tf_idf_norm = vectorial_search.vectorial_search(v_query1, collection_doc_nb, index, wordDic, time_it=True, mode='tf-idf-norm')[1]
         t_q1_freq_norm = vectorial_search.vectorial_search(v_query1, collection_doc_nb, index, wordDic, time_it=True, mode='freq-norm')[1]
         f.write("Query 1 ({}) answered in:\n\t{:.4f}s for tf_idf,\n\t{:.4f}s for normalized tf-idf,\n\t{:.4f}s in normalized freqency.\n".format(v_query1,t_q1_tf_idf,t_q1_tf_idf_norm,t_q1_freq_norm))
-        
+
         # query 2
         t_q2_tf_idf = vectorial_search.vectorial_search(v_query2, collection_doc_nb, index, wordDic, time_it=True, mode='tf-idf')[1]
         t_q2_tf_idf_norm = vectorial_search.vectorial_search(v_query2, collection_doc_nb, index, wordDic, time_it=True, mode='tf-idf-norm')[1]
         t_q2_freq_norm = vectorial_search.vectorial_search(v_query2, collection_doc_nb, index, wordDic, time_it=True, mode='freq-norm')[1]
         f.write("Query 1 ({}) answered in:\n\t{:.4f}s for tf_idf,\n\t{:.4f}s for normalized tf-idf,\n\t{:.4f}s in normalized freqency.\n".format(v_query2,t_q2_tf_idf,t_q2_tf_idf_norm,t_q2_freq_norm))
-        
+
         # query 3
         t_q3_tf_idf = vectorial_search.vectorial_search(v_query3, collection_doc_nb, index, wordDic, time_it=True, mode='tf-idf')[1]
         t_q3_tf_idf_norm = vectorial_search.vectorial_search(v_query3, collection_doc_nb, index, wordDic, time_it=True, mode='tf-idf-norm')[1]
         t_q3_freq_norm = vectorial_search.vectorial_search(v_query3, collection_doc_nb, index, wordDic, time_it=True, mode='freq-norm')[1]
         f.write("Query 1 ({}) answered in:\n\t{:.4f}s for tf_idf,\n\t{:.4f}s for normalized tf-idf,\n\t{:.4f}s in normalized freqency.\n".format(v_query3,t_q3_tf_idf,t_q3_tf_idf_norm,t_q3_freq_norm))
-        
+
         # query 4
         t_q4_tf_idf = vectorial_search.vectorial_search(v_query4, collection_doc_nb, index, wordDic, time_it=True, mode='tf-idf')[1]
         t_q4_tf_idf_norm = vectorial_search.vectorial_search(v_query4, collection_doc_nb, index, wordDic, time_it=True, mode='tf-idf-norm')[1]
         t_q4_freq_norm = vectorial_search.vectorial_search(v_query4, collection_doc_nb, index, wordDic, time_it=True, mode='freq-norm')[1]
         f.write("Query 1 ({}) answered in:\n\t{:.4f}s for tf_idf,\n\t{:.4f}s for normalized tf-idf,\n\t{:.4f}s in normalized freqency.\n".format(v_query4,t_q4_tf_idf,t_q4_tf_idf_norm,t_q4_freq_norm))
-        
+
 
         f.write("\n# --------------------------------------\n# -- Pertinence\n# --------------------------------------\n")
-        
-        
+
+    queries = parse_queries('data/CACM/query.text', common_words)
+    qrel_exp = dict()
+    for queryID, query in queries.items():
+        qrel_exp[queryID] = vectorial_search.vectorial_search(query, collection_doc_nb, index, wordDic, False)
+
+    qrel_real = parse_qrel('data/CACM/qrels.text')
+    print('QREL EXP\n', qrel_exp)
+    print('QREL REAL\n', qrel_real)
