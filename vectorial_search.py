@@ -22,9 +22,6 @@ def build_vect_space(index:dict, wordDic:dict, collection_size:int):
         vect_space[docID] = vect_weights
     return vect_space
 
-            
-
-
 def get_term_frequency(wordID: int, document: int, index: dict):
     try:
          return list(j for i, j in index[wordID] if i == document)[0]
