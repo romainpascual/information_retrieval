@@ -248,5 +248,9 @@ if doEvaluation:
         qrel_exp[queryID] = vectorial_search.vectorial_search(query, collection_doc_nb, index, wordDic, False)
 
     qrel_real = parse_qrel('data/CACM/qrels.text')
-    print('QREL EXP\n', qrel_exp)
-    print('QREL REAL\n', qrel_real)
+    
+    from evaluation_vect import plot_precision_recall
+    for query, answer in qrel_real.items():
+        if len(answer)>0:
+            print(answer, qrel_real[query])
+            plot_precision_recall(answer, qrel_real[query])

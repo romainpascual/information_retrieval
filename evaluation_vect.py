@@ -10,9 +10,14 @@ def precision_recall(found, pertinents):
         f = found[k]
         if f in pertinents:
             pertinent_found += 1
-        recall = pertinent_found // len(pertinents)
-        precision = pertinent_found // (k+1)
+        recall = pertinent_found / len(pertinents)
+        precision = pertinent_found / (k+1)
         precision_recall.append([recall, precision])
+    print("pr :", precision_recall)
+    a = set(found)
+    b = set(pertinents)
+    c = set.union(a,b)
+    print("intersection :",c)
     return precision_recall
 
 def plot_precision_recall(found, pertinents):
