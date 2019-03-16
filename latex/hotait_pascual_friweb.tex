@@ -128,9 +128,44 @@ On cherche à évaluer les systèmes de recherche de deux manières différentes
 
 \paragraph{Mesure de performances} L'index a été crée en $0.4490$s et est stocké dans un fichier de $975.9$ko sur le disque.
 Pour des recherches booléennes, le temps de réponse est de l'ordre de $10^{-4}$s.
-Pour des recherches vectorielles, le temps de réponse est de l'ordre de $10^{-2}$s pour les pondérations 'tf_idf' et 'tf-idf-norm' et de l'ordre de $10^{-1}$s pour la pondération 'freq-norm'.
+Pour des recherches vectorielles, le temps de réponse est de l'ordre de $10^{-2}$s pour les pondérations 'tf-idf' et 'tf-idf-norm' et de l'ordre de $10^{-1}$s pour la pondération 'freq-norm'.
 
-\paragraph{Mesure de pertinence}
+\paragraph{Mesure de pertinence} L'évaluation de la pertinence des requêtes est effectuée à l'aide de la série de requête et de documents pertinents proposés dans la collection CACM. On obtient ainsi différentes courbes précision-rappel (figure \ref{fig:precision-recall}). On calcule aussi la E-mesure et la F-measure moyenne sur l'ensemble des requêtes. On obtient ainsi les résultats suivants :
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+Pondération         & E mesure & F mesure \\ \hline
+tf-idf              & 0.84     & 0.14     \\ \hline
+tf-idf normalisé    & 0.82     & 0.16     \\ \hline
+fréquence normalisé & 0.84     & 0.15     \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}[b]{0.27\textwidth}
+	\centering \includegraphics[width=\textwidth]{36_tf_ifd.png}
+	\caption{Courbe précision-rappel pour la requête $36$ et la pondération 'tf-idf'}
+	\label{fig:precision-recall-1}
+	\end{subfigure}
+~
+\begin{subfigure}[b]{0.27\textwidth}
+	\centering \includegraphics[width=\textwidth]{36_tf_ifd_norm.png}
+	\caption{Courbe précision-rappel pour la requête $36$ et la pondération 'tf-idf-norm'}
+	\label{fig:precision-recall-2}
+	\end{subfigure}
+~
+\begin{subfigure}[b]{0.27\textwidth}
+	\centering \includegraphics[width=\textwidth]{36_freq_norm.png}
+	\caption{Courbe précision-rappel pour la requête $36$ et la pondération 'freq-norm'}
+	\label{fig:precision-recall-3}
+	\end{subfigure}
+
+\caption{Courbes Précision-Rappel pour la requête 36.}
+\label{fig:precision-recall}
+\end{figure}
 
 \noindent \textsc{Remarque} : il est possible d'exécuter l'évaluation de la collection, ce qui créera un fichier \texttt{CACM\_evaluation} dans le dossier \texttt{results} avec des résultats d'évaluation un peu plus détaillés.
 

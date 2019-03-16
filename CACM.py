@@ -199,7 +199,7 @@ while(doVectorialRequest):
             print("Cela correspond aux documents :",res)
 
 import os
-from input import parse_queries, parse_qrel
+import evaluation_vect
 doEvaluation = 0
 try:
     doEvaluation = int(input("Do you want to output evaluation parameters ?[0/1]\n"))
@@ -260,57 +260,17 @@ if doEvaluation:
 
 
         f.write("\n# --------------------------------------\n# -- Pertinence\n# --------------------------------------\n")
+        f.write("Evaluation done based on the queries proposed in the CACM database\n")
+        pertinence = evaluation_vect.process_vect_eval(common_words, collection_doc_nb, index, wordDic)
+        f.write("For the tf-idf weight,\n\tthe mean of E_measure is {},\n\tthe mean of F_measure is {}\n".format(
+                                                                                                pertinence['Emoy tf-idf'],
+                                                                                                pertinence['Fmoy tf-idf']))
+        
+        f.write("For the tf-idf-norm weight,\n\tthe mean of E_measure is {},\n\tthe mean of F_measure is {}\n".format(
+                                                                                                pertinence['Emoy tf-idf-norm'],
+                                                                                                pertinence['Fmoy tf-idf-norm']))
+        
+        f.write("For the freq-norm weight,\n\tthe mean of E_measure is {},\n\tthe mean of F_measure is {}\n".format(
+                                                                                                pertinence['Emoy freq-norm'],
+                                                                                                pertinence['Fmoy freq-norm']))
 
-    queries = parse_queries('data/CACM/query.text', common_words)
-    qrel_exp1 = dict()
-    qrel_exp3 = dict()
-    qrel_exp2 = dict()
-    for queryID, query in tqdm(queries.items()):
-        qrel_exp1[queryID] = vectorial_search.vectorial_search(query,
-                                                              collection_doc_nb,
-                                                              index, wordDic,
-                                                              time_it=False,
-                                                              mode='tf-idf')
-        qrel_exp2[queryID] = vectorial_search.vectorial_search(query,
-                                                              collection_doc_nb,
-                                                              index, wordDic,
-                                                              time_it=False,
-                                                              mode='tf-idf-norm')
-        qrel_exp3[queryID] = vectorial_search.vectorial_search(query,
-                                                              collection_doc_nb,
-                                                              index, wordDic,
-                                                              time_it=False,
-                                                              mode='freq-norm')
-
-    qrel_real = parse_qrel('data/CACM/qrels.text')
-    
-    #print('QREL EXP\n', qrel_exp1)
-    #print('QREL EXP\n', qrel_exp2)
-    #print('QREL EXP\n', qrel_exp3)
-    #print('QREL REAL\n', qrel_real)
-    
-    import evaluation_vect
-    exp1 = 0
-    E_tot1 = 0
-    F_tot1 = 0
-    for query, answer in qrel_exp1.items():
-        if len(answer) > 0:
-            exp1 += 1
-            #evaluation_vect.plot_precision_recall(answer, qrel_real[query])
-    
-    exp2 = 0
-    E_tot2 = 0
-    F_tot2 = 0
-    for query, answer in qrel_exp2.items():
-        if len(answer) > 0:
-            exp2 += 1
-            #evaluation_vect.plot_precision_recall(answer, qrel_real[query])
-            
-
-    exp3 = 0
-    E_tot3 = 0
-    F_tot3 = 0
-    for query, answer in qrel_exp3.items():
-        if len(answer) > 0:
-            exp3 += 1
-            #evaluation_vect.plot_precision_recall(answer, qrel_real[query])

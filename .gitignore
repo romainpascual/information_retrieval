@@ -1,11 +1,27 @@
 .DS_Store
+
+# Data
 data
+
+# Partial index storing
 indexes/
+!indexes/.gitkeep
+
+# Pythons
 venv
 .idea
-*.png
 __pycache__/
+
+# Images
+*.png
+
+# Results
 results
+!results/.gitkeep
+precision_recall
+!precision_recall/.gitkeep
+
+# Latex images
 !latex/*.png
 
 

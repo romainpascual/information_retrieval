@@ -151,3 +151,11 @@ def parse_queries(filename, common_words):
     for queryID, query in queries.items():
         queries[queryID]= ' '.join(query)
     return queries
+
+if __name__ == "__main__":
+    qrel_real = parse_qrel('data/CACM/qrels.text')
+    for k in qrel_real:
+        print(k)
+
+    """ --> All requests do not have an answer
+    """
