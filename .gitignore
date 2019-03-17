@@ -2,6 +2,7 @@
 
 # Data
 data
+!data/.gitkeep
 
 # Partial index storing
 indexes/
