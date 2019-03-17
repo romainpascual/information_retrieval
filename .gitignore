@@ -1,7 +1,7 @@
 .DS_Store
 
 # Data
-data
+data/
 !data/.gitkeep
 
 # Partial index storing
@@ -17,9 +17,9 @@ __pycache__/
 *.png
 
 # Results
-results
+results/
 !results/.gitkeep
-precision_recall
+precision_recall/
 !precision_recall/.gitkeep
 
 # Latex images
